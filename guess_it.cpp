@@ -14,6 +14,7 @@ int main() {
 		cout << "Play again (Yes/No): ";
 		cin >> again;
 	} while (again == "Yes");
+	cout<<"huy";
 	return 0;
 }
 void playGuess() {
