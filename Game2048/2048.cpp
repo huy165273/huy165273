@@ -11,7 +11,7 @@ const int SCREEN_WIDTH = 450;
 const int SCREEN_HEIGHT = 600;
 const int FIRST_NUMBER_COORDINATE_X = 25;
 const int FIRST_NUMBER_COORDINATE_Y = 150;
-const int SIZE_NUMBER = 100;
+const int SUM_SIZE_NUMBER = 400; //kích thước tổng các số
 const int amount_image = 13;
 
 const int size_max = 10;
@@ -95,6 +95,8 @@ int main(int arc, char *argv[])
             } while (!gameOver() || win());
         }
     }
+    delete array;
+    delete arrayBefore;
     close();
     return 0;
 }
@@ -179,10 +181,10 @@ void screenSurface(){
     SDL_Surface* numberSurface=NULL;
     for(int i=0;i<gameSize;i++){
         for(int j=0;j<gameSize;j++){
-            stretch.x=FIRST_NUMBER_COORDINATE_X+ SIZE_NUMBER*j;
-            stretch.y=FIRST_NUMBER_COORDINATE_Y+ SIZE_NUMBER*i;
-            stretch.w=SIZE_NUMBER;
-            stretch.h=SIZE_NUMBER;
+            stretch.x=FIRST_NUMBER_COORDINATE_X+(SUM_SIZE_NUMBER/gameSize)*j;
+            stretch.y=FIRST_NUMBER_COORDINATE_Y+(SUM_SIZE_NUMBER/gameSize)*i;
+            stretch.w=(SUM_SIZE_NUMBER/gameSize);
+            stretch.h=(SUM_SIZE_NUMBER/gameSize);
             switch(array[i][j]){
                 case 0: 
                     numberSurface=gDisplaySurface[1];
@@ -221,13 +223,11 @@ void screenSurface(){
                     numberSurface=gDisplaySurface[12];
                     break;
             }
-            SDL_BlitSurface(numberSurface, NULL, gScreenSurface, &stretch);
+            SDL_BlitScaled(numberSurface, NULL, gScreenSurface, &stretch);
+            numberSurface=NULL;
         }
     }
 }
-//
-//
-//
 
 void playGame()
 {   
@@ -238,7 +238,7 @@ void playGame()
 }
 int enterGameSize()
 {
-    return 4;
+    return 6;
 }
 void randomNumber()
 {
