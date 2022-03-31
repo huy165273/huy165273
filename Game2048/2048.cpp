@@ -11,12 +11,13 @@ const int SCREEN_WIDTH = 450;
 const int SCREEN_HEIGHT = 600;
 const int FIRST_NUMBER_COORDINATE_X = 25;
 const int FIRST_NUMBER_COORDINATE_Y = 150;
-const int SUM_SIZE_NUMBER = 400; //kích thước tổng các số
+const int SUM_SIZE_NUMBER = 400; // kích thước tổng các số
 const int amount_image = 13;
 
-const int size_max = 10;
-int **array= new int *[size_max];
-int **arrayBefore= new int *[size_max];
+const int size_max = 8;
+int **array = new int *[size_max];
+int **arrayBefore = new int *[size_max];
+int score=0;
 int gameSize;
 void randomNumber();
 bool gameOver();
@@ -24,11 +25,15 @@ bool win();
 void khoiTaoMang();
 int enterGameSize();
 void playGame();
+int hightScore();
+
 
 bool init();
 bool loadMedia();
 void close();
 void screenSurface();
+void showScore();
+void showHighScore();
 SDL_Surface *loadImage(string path);
 SDL_Window *gWindow = NULL;
 SDL_Surface *gScreenSurface = NULL;           // bề mặt của cửa sổ
@@ -47,7 +52,11 @@ int main(int arc, char *argv[])
         }
         else
         {
-            playGame();
+            // playGame();
+            gameSize = enterGameSize();
+            khoiTaoMang();
+            randomNumber();
+            randomNumber();
             bool quit = false;
             SDL_Event e;
             do
@@ -66,16 +75,16 @@ int main(int arc, char *argv[])
                             switch (e.key.keysym.sym)
                             {
                             case SDLK_UP: // xử lý hàm khi di chuyển lên
-                                updateArrayUp(array, gameSize);
+                                updateArrayUp(array, gameSize, score);
                                 break;
                             case SDLK_DOWN: // xử lý hoàm khi di chuyển xuống
-                                updateArrayDown(array, gameSize);
+                                updateArrayDown(array, gameSize, score);
                                 break;
                             case SDLK_LEFT: // xử lý hàm khi di chuyển sang trái
-                                updateArrayLeft(array, gameSize);
+                                updateArrayLeft(array, gameSize, score);
                                 break;
                             case SDLK_RIGHT: // xử lý hàm khi di chuyển sang phải
-                                updateArrayRight(array, gameSize);
+                                updateArrayRight(array, gameSize, score);
                                 break;
                             }
                             if (!compareArray(arrayBefore, array, gameSize))
@@ -89,7 +98,9 @@ int main(int arc, char *argv[])
                     stretch.h = SCREEN_HEIGHT;
                     stretch.w = SCREEN_WIDTH;
                     SDL_BlitScaled(gDisplaySurface[0], NULL, gScreenSurface, &stretch);
+                    showHighScore();
                     screenSurface();
+                    showScore();
                     SDL_UpdateWindowSurface(gWindow);
                 }
             } while (!gameOver() || win());
@@ -176,61 +187,65 @@ SDL_Surface *loadImage(string path)
     }
     return optimizeSurface;
 }
-void screenSurface(){
+void screenSurface()
+{
     SDL_Rect stretch;
-    SDL_Surface* numberSurface=NULL;
-    for(int i=0;i<gameSize;i++){
-        for(int j=0;j<gameSize;j++){
-            stretch.x=FIRST_NUMBER_COORDINATE_X+(SUM_SIZE_NUMBER/gameSize)*j;
-            stretch.y=FIRST_NUMBER_COORDINATE_Y+(SUM_SIZE_NUMBER/gameSize)*i;
-            stretch.w=(SUM_SIZE_NUMBER/gameSize);
-            stretch.h=(SUM_SIZE_NUMBER/gameSize);
-            switch(array[i][j]){
-                case 0: 
-                    numberSurface=gDisplaySurface[1];
-                    break;
-                case 2: 
-                    numberSurface=gDisplaySurface[2];
-                    break;
-                case 4: 
-                    numberSurface=gDisplaySurface[3];
-                    break;
-                case 8: 
-                    numberSurface=gDisplaySurface[4];
-                    break;
-                case 16: 
-                    numberSurface=gDisplaySurface[5];
-                    break;
-                case 32: 
-                    numberSurface=gDisplaySurface[6];
-                    break;
-                case 64: 
-                    numberSurface=gDisplaySurface[7];
-                    break;
-                case 128: 
-                    numberSurface=gDisplaySurface[8];
-                    break;
-                case 256: 
-                    numberSurface=gDisplaySurface[9];
-                    break;
-                case 512: 
-                    numberSurface=gDisplaySurface[10];
-                    break;
-                case 1024: 
-                    numberSurface=gDisplaySurface[11];
-                    break;
-                case 2048: 
-                    numberSurface=gDisplaySurface[12];
-                    break;
+    SDL_Surface *numberSurface = NULL;
+    for (int i = 0; i < gameSize; i++)
+    {
+        for (int j = 0; j < gameSize; j++)
+        {
+            stretch.x = FIRST_NUMBER_COORDINATE_X + (SUM_SIZE_NUMBER / gameSize) * j;
+            stretch.y = FIRST_NUMBER_COORDINATE_Y + (SUM_SIZE_NUMBER / gameSize) * i;
+            stretch.w = (SUM_SIZE_NUMBER / gameSize);
+            stretch.h = (SUM_SIZE_NUMBER / gameSize);
+            switch (array[i][j])
+            {
+            case 0:
+                numberSurface = gDisplaySurface[1];
+                break;
+            case 2:
+                numberSurface = gDisplaySurface[2];
+                break;
+            case 4:
+                numberSurface = gDisplaySurface[3];
+                break;
+            case 8:
+                numberSurface = gDisplaySurface[4];
+                break;
+            case 16:
+                numberSurface = gDisplaySurface[5];
+                break;
+            case 32:
+                numberSurface = gDisplaySurface[6];
+                break;
+            case 64:
+                numberSurface = gDisplaySurface[7];
+                break;
+            case 128:
+                numberSurface = gDisplaySurface[8];
+                break;
+            case 256:
+                numberSurface = gDisplaySurface[9];
+                break;
+            case 512:
+                numberSurface = gDisplaySurface[10];
+                break;
+            case 1024:
+                numberSurface = gDisplaySurface[11];
+                break;
+            case 2048:
+                numberSurface = gDisplaySurface[12];
+                break;
             }
             SDL_BlitScaled(numberSurface, NULL, gScreenSurface, &stretch);
-            numberSurface=NULL;
+            numberSurface = NULL;
         }
     }
 }
 
 void playGame()
-{   
+{
     gameSize = enterGameSize();
     khoiTaoMang();
     randomNumber();
@@ -238,7 +253,7 @@ void playGame()
 }
 int enterGameSize()
 {
-    return 6;
+    return 8;
 }
 void randomNumber()
 {
@@ -299,7 +314,27 @@ void khoiTaoMang()
 {
     for (int i = 0; i < gameSize; i++)
     {
-        array[i]= new int [gameSize]();
-        arrayBefore[i]= new int [gameSize]();
+        array[i] = new int[gameSize]();
+        arrayBefore[i] = new int[gameSize]();
     }
+}
+int hightScore(){
+    fstream file;
+    file.open("diem_cao.txt");
+    int higth_score[6];
+    for(int i=0;i<6;i++)
+    file>>higth_score[i];
+    file.close();
+    file.open("diem_cao.txt", ios::out | ios::trunc);
+    if(score>higth_score[gameSize-3]) higth_score[gameSize-3]=score;
+    for(int i=0;i<6;i++)
+        file<<higth_score[i]<<endl;
+    file.close();
+    return higth_score[gameSize-3];
+}
+void showScore(){
+
+}
+void showHighScore(){
+    
 }
