@@ -1,7 +1,7 @@
 #include<vector>
 #include "array_manipulation.h"
 using namespace std;
-void updateArrayUp(int **array, const int gameSize)
+void updateArrayUp(int **array, const int gameSize, int &score)
 {
     for (int j = 0; j < gameSize; j++)
     {   
@@ -19,6 +19,7 @@ void updateArrayUp(int **array, const int gameSize)
                 if (array[i][j] == array[i + 1][j] && array[i][j] != 0&& arrayCheck[i] && arrayCheck[i + 1])
                 {
                     array[i][j] *= 2;
+                    score+=array[i][j];
                     array[i + 1][j] = 0;
                     arrayCheck[i]=false;
                 }
@@ -36,7 +37,7 @@ void updateArrayUp(int **array, const int gameSize)
     }
 }
 
-void updateArrayDown(int **array, const int gameSize)
+void updateArrayDown(int **array, const int gameSize, int &score)
 {
     // cout << "down" << endl;
     for (int j = 0; j < gameSize; j++)
@@ -55,6 +56,7 @@ void updateArrayDown(int **array, const int gameSize)
                 if (array[i][j] == array[i - 1][j] && array[i][j] != 0 && arrayCheck[i] && arrayCheck[i-1] )
                 {
                     array[i][j] *= 2;
+                    score+=array[i][j];
                     array[i - 1][j] = 0;
                     arrayCheck[i]=false;
                 }
@@ -71,7 +73,7 @@ void updateArrayDown(int **array, const int gameSize)
         }
     }
 }
-void updateArrayRight(int **array, const int gameSize)
+void updateArrayRight(int **array, const int gameSize, int &score)
 {
     //cout << "right" << endl;
     for (int i = 0; i < gameSize; i++)
@@ -90,6 +92,7 @@ void updateArrayRight(int **array, const int gameSize)
                 if (array[i][j] == array[i][j - 1] && array[i][j] != 0 &&arrayCheck[j] && arrayCheck[j-1])
                 {
                     array[i][j] *= 2;
+                    score+=array[i][j];
                     array[i][j - 1] = 0;
                     arrayCheck[j]=false;
                 }
@@ -107,7 +110,7 @@ void updateArrayRight(int **array, const int gameSize)
     }
 
 }
-void updateArrayLeft(int **array, const int gameSize)
+void updateArrayLeft(int **array, const int gameSize, int &score)
 {
     //cout << "left" << endl;
     for (int i = 0; i < gameSize; i++)
@@ -126,6 +129,7 @@ void updateArrayLeft(int **array, const int gameSize)
                 if (array[i][j] == array[i][j+1] && array[i][j] != 0 && arrayCheck[j] &&arrayCheck[j+1])
                 {
                     array[i][j] *= 2;
+                    score+=array[i][j];
                     array[i][j+1] = 0;
                     arrayCheck[j]=false;
                 }
@@ -162,5 +166,13 @@ void updateArrayBefore(int **arrayBefore, int ** array, const int gameSize)
         {
             arrayBefore[i][j] = array[i][j];
         }
+    }
+}
+void khoiTaoMang(int **array, int **arrayBefore, const int& gameSize)
+{
+    for (int i = 0; i < gameSize; i++)
+    {
+        array[i] = new int[gameSize]();
+        arrayBefore[i] = new int[gameSize]();
     }
 }

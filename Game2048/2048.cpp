@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <vector>
 #include "array_manipulation.h"
+#include "end_game.h"
 using namespace std;
 
 const int SCREEN_WIDTH = 450;
@@ -12,32 +13,39 @@ const int SCREEN_HEIGHT = 600;
 const int FIRST_NUMBER_COORDINATE_X = 25;
 const int FIRST_NUMBER_COORDINATE_Y = 150;
 const int SUM_SIZE_NUMBER = 400; // kích thước tổng các số
-const int amount_image = 13;
+const int amount_image = 19;
 
 const int size_max = 8;
+const int size_min = 3;
 int **array = new int *[size_max];
 int **arrayBefore = new int *[size_max];
-int score=0;
+int score = 0;
 int gameSize;
+
 void randomNumber();
 bool gameOver();
 bool win();
-void khoiTaoMang();
-int enterGameSize();
-void playGame();
 int hightScore();
-
 
 bool init();
 bool loadMedia();
 void close();
+
 void screenSurface();
 void showScore();
 void showHighScore();
+void chooseGame(SDL_Event &e, bool &play, bool &quit, int &count);
+void playGame(SDL_Event &e, bool &quit, int &count, bool &play);
+void chooseSize(bool &play, int &count);
+void back(const int &x, const int &y);
+bool playAgain(const int &x, const int &y);
+bool house(const int &x, const int &y);
+
 SDL_Surface *loadImage(string path);
 SDL_Window *gWindow = NULL;
 SDL_Surface *gScreenSurface = NULL;           // bề mặt của cửa sổ
 SDL_Surface *(gDisplaySurface[amount_image]); // mảng hình ảnh hiển thị
+
 int main(int arc, char *argv[])
 {
     if (!init())
@@ -52,58 +60,26 @@ int main(int arc, char *argv[])
         }
         else
         {
-            // playGame();
-            gameSize = enterGameSize();
-            khoiTaoMang();
-            randomNumber();
-            randomNumber();
             bool quit = false;
             SDL_Event e;
-            do
+            bool play = false;
+            int count = size_min;
+            while (!quit)
             {
-                while (!quit)
+                do
                 {
-                    while (SDL_PollEvent(&e) != 0)
+                    if (!play)
                     {
-                        if (e.type == SDL_QUIT)
-                        {
-                            quit = true;
-                        }
-                        else if (e.type == SDL_KEYDOWN)
-                        {
-                            updateArrayBefore(arrayBefore, array, gameSize);
-                            switch (e.key.keysym.sym)
-                            {
-                            case SDLK_UP: // xử lý hàm khi di chuyển lên
-                                updateArrayUp(array, gameSize, score);
-                                break;
-                            case SDLK_DOWN: // xử lý hoàm khi di chuyển xuống
-                                updateArrayDown(array, gameSize, score);
-                                break;
-                            case SDLK_LEFT: // xử lý hàm khi di chuyển sang trái
-                                updateArrayLeft(array, gameSize, score);
-                                break;
-                            case SDLK_RIGHT: // xử lý hàm khi di chuyển sang phải
-                                updateArrayRight(array, gameSize, score);
-                                break;
-                            }
-                            if (!compareArray(arrayBefore, array, gameSize))
-                                randomNumber();
-                        }
+                        chooseGame(e, play, quit, count);
                     }
-
-                    SDL_Rect stretch; // kéo căng ra
-                    stretch.x = 0;
-                    stretch.y = 0;
-                    stretch.h = SCREEN_HEIGHT;
-                    stretch.w = SCREEN_WIDTH;
-                    SDL_BlitScaled(gDisplaySurface[0], NULL, gScreenSurface, &stretch);
-                    showHighScore();
-                    screenSurface();
-                    showScore();
-                    SDL_UpdateWindowSurface(gWindow);
-                }
-            } while (!gameOver() || win());
+                    else
+                    {
+                        quit = false;
+                        gameSize = count;
+                        playGame(e, quit, count, play);
+                    }
+                } while (!play);
+            }
         }
     }
     delete array;
@@ -243,17 +219,115 @@ void screenSurface()
         }
     }
 }
-
-void playGame()
+void chooseSize(bool &play, int &count)
 {
-    gameSize = enterGameSize();
-    khoiTaoMang();
-    randomNumber();
-    randomNumber();
+    if (!play)
+    {
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        // sang trái
+        if (count > size_min)
+        {
+            if (x >= 100 && x <= 130 && y >= 390 && y <= 420)
+                count--;
+        }
+        // sang phải
+        if (count < size_max)
+        {
+            if (x >= 285 && x <= 305 && y >= 390 && y <= 420)
+                count++;
+        }
+        // bắt đầu
+        if (x >= 25 && x <= 425 && y >= 450 && y <= 550)
+            play = true;
+    }
 }
-int enterGameSize()
+void playGame(SDL_Event &e, bool &quit, int &count, bool &play)
 {
-    return 8;
+    khoiTaoMang(array, arrayBefore, gameSize);
+    randomNumber();
+    randomNumber();
+    do
+    {
+        while (SDL_PollEvent(&e) != 0)
+        {
+            if (e.type == SDL_QUIT)
+            {
+                quit = true;
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                updateArrayBefore(arrayBefore, array, gameSize);
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_UP: // xử lý hàm khi di chuyển lên
+                    updateArrayUp(array, gameSize, score);
+                    break;
+                case SDLK_DOWN: // xử lý hoàm khi di chuyển xuống
+                    updateArrayDown(array, gameSize, score);
+                    break;
+                case SDLK_LEFT: // xử lý hàm khi di chuyển sang trái
+                    updateArrayLeft(array, gameSize, score);
+                    break;
+                case SDLK_RIGHT: // xử lý hàm khi di chuyển sang phải
+                    updateArrayRight(array, gameSize, score);
+                    break;
+                }
+                if (!compareArray(arrayBefore, array, gameSize))
+                    randomNumber();
+            }
+            else if (e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (playAgain(x, y))
+                {
+                    khoiTaoMang(array, arrayBefore, gameSize);
+                    randomNumber();
+                    randomNumber();
+                }
+                if (house(x, y))
+                {
+                    play = false;
+                    count = size_min;
+                }
+                back(x, y);
+            }
+        }
+        if (!play)
+            break;
+        SDL_Rect stretch; // kéo căng ra
+        stretch.x = 0;
+        stretch.y = 0;
+        stretch.h = SCREEN_HEIGHT;
+        stretch.w = SCREEN_WIDTH;
+        SDL_BlitScaled(gDisplaySurface[0], NULL, gScreenSurface, &stretch);
+        showHighScore();
+        screenSurface();
+        showScore();
+        SDL_UpdateWindowSurface(gWindow);
+    } while ((!gameOver(array, gameSize) || win(array, gameSize)) && play);
+}
+void chooseGame(SDL_Event &e, bool &play, bool &quit, int &count)
+{
+    while (SDL_PollEvent(&e) != 0)
+    {
+        if (e.type == SDL_QUIT)
+        {
+            quit = true;
+        }
+        else if (e.type == SDL_MOUSEBUTTONDOWN)
+        {
+            chooseSize(play, count);
+        }
+    }
+    SDL_Rect stretch; // kéo căng ra
+    stretch.x = 0;
+    stretch.y = 0;
+    stretch.h = SCREEN_HEIGHT;
+    stretch.w = SCREEN_WIDTH;
+    SDL_BlitScaled(gDisplaySurface[10 + count], NULL, gScreenSurface, &stretch);
+    SDL_UpdateWindowSurface(gWindow);
 }
 void randomNumber()
 {
@@ -285,56 +359,33 @@ void randomNumber()
             }
     }
 }
-
-bool gameOver()
+void showScore()
 {
-    for (int i = 0; i < gameSize; i++)
-    {
-        for (int j = 0; j < gameSize; j++)
-        {
-            if (array[i][j] == 0)
-                return false;
-        }
-    }
-    return true;
 }
-bool win()
+void showHighScore()
 {
-    for (int i = 0; i < gameSize; i++)
+}
+void back(const int &x, const int &y)
+{
+    if (x >= 360 && x <= 400 && y >= 100 && y <= 140)
     {
-        for (int j = 0; j < gameSize; j++)
-        {
-            if (array[i][j] == 2048)
-                return true;
-        }
+        updateArrayBefore(array, arrayBefore, gameSize);
+    }
+}
+bool playAgain(const int &x, const int &y)
+{
+
+    if (x >= 295 && x <= 335 && y >= 100 && y <= 140)
+    {
+        return true;
     }
     return false;
 }
-void khoiTaoMang()
+bool house(const int &x, const int &y)
 {
-    for (int i = 0; i < gameSize; i++)
+    if (x >= 25 && x <= 65 && y >= 100 && y <= 140)
     {
-        array[i] = new int[gameSize]();
-        arrayBefore[i] = new int[gameSize]();
+        return true;
     }
-}
-int hightScore(){
-    fstream file;
-    file.open("diem_cao.txt");
-    int higth_score[6];
-    for(int i=0;i<6;i++)
-    file>>higth_score[i];
-    file.close();
-    file.open("diem_cao.txt", ios::out | ios::trunc);
-    if(score>higth_score[gameSize-3]) higth_score[gameSize-3]=score;
-    for(int i=0;i<6;i++)
-        file<<higth_score[i]<<endl;
-    file.close();
-    return higth_score[gameSize-3];
-}
-void showScore(){
-
-}
-void showHighScore(){
-    
+    return false;
 }
