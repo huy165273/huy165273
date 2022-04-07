@@ -23,9 +23,6 @@ int score = 0;
 int gameSize;
 
 void randomNumber();
-bool gameOver();
-bool win();
-int hightScore();
 
 bool init();
 bool loadMedia();
@@ -359,12 +356,6 @@ void randomNumber()
             }
     }
 }
-void showScore()
-{
-}
-void showHighScore()
-{
-}
 void back(const int &x, const int &y)
 {
     if (x >= 360 && x <= 400 && y >= 100 && y <= 140)
@@ -388,4 +379,10 @@ bool house(const int &x, const int &y)
         return true;
     }
     return false;
+}
+void showScore()
+{
+}
+void showHighScore()
+{
 }
