@@ -12,12 +12,16 @@ const int SIZE_HEIGHT_MAX = 15;
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 600;
 const int amount_image = 9;
-const int image_number_max = 7;
+const int image_number_max = 8;
 
 bool init();
 bool loadMedia();
 void close();
 void showImage();
+void youLose();
+void youWin();
+void buttonLeft(bool &check);
+void buttonRight();
 
 SDL_Surface *loadImage(string path);
 SDL_Window *gWindow = NULL;
@@ -26,11 +30,15 @@ SDL_Surface *(imageNumber[image_number_max]); // các ảnh số
 SDL_Surface *house = NULL;
 SDL_Surface *bom = NULL;
 SDL_Surface *co = NULL;
+SDL_Surface *hoicham = NULL;
+SDL_Surface *win = NULL;
+SDL_Surface *lose = NULL;
 
 int mapWidth = 10;
 int mapHeight = 10;
 int **map = new int *[SIZE_HEIGHT_MAX];
 int **showMap = new int *[SIZE_HEIGHT_MAX];
+int **tickMap = new int *[SIZE_HEIGHT_MAX];
 void playGame();
 
 int main(int arc, char *argv[])
@@ -53,6 +61,14 @@ int main(int arc, char *argv[])
             SDL_Event e;
             while (!quit)
             {
+                while (SDL_PollEvent(&e) != 0)
+                {
+                    // User requests quit
+                    if (e.type == SDL_QUIT)
+                    {
+                        quit = true;
+                    }
+                }
                 while (check)
                 {
                     while (SDL_PollEvent(&e) != 0)
@@ -66,28 +82,22 @@ int main(int arc, char *argv[])
                         {
                             if (e.type == SDL_MOUSEBUTTONDOWN)
                             {
-                                int x, y;
-                                SDL_GetMouseState(&x, &y);
-                                if (x >= 275 && x <= 725 && y >= 125 && y <= 575)
+                                if (e.button.button == SDL_BUTTON_LEFT)
                                 {
-                                    x = (x - 275) / 45;
-                                    y = (y - 125) / 45;
-                                    if (checkBomb(y, x, map))
-                                    {
-                                        check = false;
-                                        cout << "You are dead! You lose!" << endl;
-                                    }
-                                    else
-                                    {
-                                        editShowMap(y, x, map, showMap, mapWidth, mapHeight);
-                                    }
+                                    buttonLeft(check);
+                                }
+                                if (e.button.button == SDL_BUTTON_RIGHT)
+                                {
+                                    buttonRight();
                                 }
                             }
                         }
-                        showImage();
+                        if (check)
+                            showImage();
                         SDL_UpdateWindowSurface(gWindow);
                     }
-                    if(quit) break;
+                    if (quit)
+                        break;
                 }
             }
         }
@@ -127,6 +137,8 @@ void close()
     bom = NULL;
     SDL_FreeSurface(co);
     co = NULL;
+    SDL_FreeSurface(hoicham);
+    hoicham = NULL;
     for (int i = 0; i < image_number_max; i++)
     {
         SDL_FreeSurface(imageNumber[i]);
@@ -154,6 +166,8 @@ bool loadMedia()
         bom = loadImage(path);
         file >> path;
         co = loadImage(path);
+        file >> path;
+        hoicham = loadImage(path);
         for (int i = 0; i < image_number_max; i++)
         {
             file >> path;
@@ -164,6 +178,10 @@ bool loadMedia()
                 cout << "Failed to load image: " << path << endl;
             }
         }
+        file >> path;
+        win = loadImage(path);
+        file >> path;
+        lose = loadImage(path);
     }
     return success;
 }
@@ -187,30 +205,9 @@ void playGame()
     int x, y;
     mapInitialization(map, mapWidth, mapHeight);
     showMapInitialization(showMap, mapWidth, mapHeight);
-    randomBombMap(map, mapWidth, mapHeight, 10);
+    mapInitialization(tickMap, mapWidth, mapHeight);
+    randomBombMap(map, mapWidth, mapHeight, 20);
     numberInMap(map, mapWidth, mapHeight);
-    bool check = true;
-    /*while (check)
-    {
-        cout << "Enter the coordinates of your choice: ";
-        cin >> x >> y;
-        if (checkBomb(x, y, map))
-        {
-            check = false;
-            cout << "You are dead! You lose!" << endl;
-            cout << "Bomb map: " << endl;
-        }
-        else
-        {
-            editShowMap(x, y, map, showMap, mapWidth, mapHeight);
-        }
-        if (checkMap(map, showMap, mapWidth, mapHeight))
-        {
-            check = false;
-            cout << "Congratulate! You win!" << endl;
-            cout << "Bomb map: " << endl;
-        }
-    }*/
 }
 void showImage()
 {
@@ -228,14 +225,79 @@ void showImage()
             stretch.y = 125 + 45 * i;
             stretch.w = 45;
             stretch.h = 45;
-            if (map[i][j] >= 0 && map[i][j] <= 6)
+            if (map[i][j] >= -1 && map[i][j] <= 6)
             {
-                SDL_BlitScaled(imageNumber[showMap[i][j]], NULL, gScreenSurface, &stretch);
+                SDL_BlitScaled(imageNumber[showMap[i][j] + 1], NULL, gScreenSurface, &stretch);
             }
-            else
-            {
-                SDL_BlitScaled(bom, NULL, gScreenSurface, &stretch);
+            if(tickMap[i][j]==1){
+                SDL_BlitScaled(co, NULL, gScreenSurface, &stretch);
+            }else{
+                if(tickMap[i][j]==2){
+                    SDL_BlitScaled(hoicham, NULL, gScreenSurface, &stretch);
+                }
             }
         }
     }
 }
+void youLose()
+{
+    SDL_Rect stretch;
+    stretch.x = 275;
+    stretch.y = 300;
+    stretch.h = 100;
+    stretch.w = 450;
+    SDL_BlitScaled(lose, NULL, gScreenSurface, &stretch);
+}
+void youWin()
+{
+    SDL_Rect stretch;
+    stretch.x = 275;
+    stretch.y = 300;
+    stretch.h = 100;
+    stretch.w = 450;
+    SDL_BlitScaled(win, NULL, gScreenSurface, &stretch);
+}
+void buttonLeft(bool &check)
+{
+    int x, y;
+    SDL_GetMouseState(&x, &y);
+    if (x >= 275 && x <= 725 && y >= 125 && y <= 575)
+    {
+        x = (x - 275) / 45;
+        y = (y - 125) / 45;
+        if (checkBomb(x, y, map) && checkMap(map, showMap, mapWidth, mapHeight))
+        {
+            check = false;
+        }
+        else
+        {
+            editShowMap(x, y, map, showMap, mapWidth, mapHeight);
+        }
+        if (checkBomb(x, y, map))
+        {
+            showImage();
+            youLose();
+        }
+        /*if (checkMap(map, showMap, mapWidth, mapHeight)){
+            showImage();
+            youWin();
+        }*/
+    }
+}
+void buttonRight()
+{
+    int x, y;
+    SDL_GetMouseState(&x, &y);
+    if (x >= 275 && x <= 725 && y >= 125 && y <= 575)
+    {
+        x = (x - 275) / 45;
+        y = (y - 125) / 45;
+        if(tickMap[y][x]==0 || tickMap[y][x]==1){
+            tickMap[y][x]++;
+        }
+        else{
+            tickMap[y][x]=0;
+        }
+    }
+}
+// hàm checkmap cần phải xem lại
