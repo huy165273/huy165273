@@ -6,13 +6,28 @@
 #include <vector>
 #include "map.h"
 using namespace std;
+struct specifications
+{
+    int xStart;
+    int yStart;
+    int mapHeight;
+    int mapWidth;
+    int sizeSquare;
+    int numberBomb;
+    specifications(int xStart_, int yStart_, int mapHeight_, int mapWidth_, int sizeSquare_, int numberBomb_)
+        : xStart(xStart_), yStart(yStart_), mapHeight(mapHeight_), mapWidth(mapWidth_), sizeSquare(sizeSquare_), numberBomb(numberBomb_) {}
+    specifications(){};
+};
 
+const specifications arraySpecifications[4] = {{275, 125, 10, 10, 45, 20},
+                                               {100, 150, 10, 20, 40, 40},
+                                               {200, 125, 15, 20, 30, 60},
+                                               {50, 125, 15, 30, 30, 100}};
 const int SIZE_WIDTH_MAX = 30;
 const int SIZE_HEIGHT_MAX = 15;
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 600;
 const int amount_image = 9;
-const int image_number_max = 8;
 
 bool init();
 bool loadMedia();
@@ -25,17 +40,13 @@ void buttonRight();
 
 SDL_Surface *loadImage(string path);
 SDL_Window *gWindow = NULL;
-SDL_Surface *gScreenSurface = NULL;           // bề mặt của cửa sổ
-SDL_Surface *(imageNumber[image_number_max]); // các ảnh số
+SDL_Surface *gScreenSurface = NULL; // bề mặt của cửa sổ
+SDL_Surface *(imageNumber[11][2]);  // các ảnh số
 SDL_Surface *house = NULL;
-SDL_Surface *bom = NULL;
-SDL_Surface *co = NULL;
-SDL_Surface *hoicham = NULL;
 SDL_Surface *win = NULL;
 SDL_Surface *lose = NULL;
 
-int mapWidth = 10;
-int mapHeight = 10;
+specifications gameSpecifications = arraySpecifications[0];
 int **map = new int *[SIZE_HEIGHT_MAX];
 int **showMap = new int *[SIZE_HEIGHT_MAX];
 int **tickMap = new int *[SIZE_HEIGHT_MAX];
@@ -133,16 +144,13 @@ void close()
 {
     SDL_FreeSurface(house);
     house = NULL;
-    SDL_FreeSurface(bom);
-    bom = NULL;
-    SDL_FreeSurface(co);
-    co = NULL;
-    SDL_FreeSurface(hoicham);
-    hoicham = NULL;
-    for (int i = 0; i < image_number_max; i++)
+    for (int i = 0; i < 11; i++)
     {
-        SDL_FreeSurface(imageNumber[i]);
-        imageNumber[i] = NULL;
+        for (int j = 0; j < 2; j++)
+        {
+            SDL_FreeSurface(imageNumber[i][j]);
+            imageNumber[i][j]= NULL;
+        }
     }
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
@@ -160,28 +168,25 @@ bool loadMedia()
     }
     else
     {
-        file >> path;
-        house = loadImage(path);
-        file >> path;
-        bom = loadImage(path);
-        file >> path;
-        co = loadImage(path);
-        file >> path;
-        hoicham = loadImage(path);
-        for (int i = 0; i < image_number_max; i++)
+        for (int i = 0; i < 11; i++)
         {
-            file >> path;
-            imageNumber[i] = loadImage(path);
-            if (imageNumber[i] == NULL)
+            for (int j = 0; j < 2; j++)
             {
-                success = false;
-                cout << "Failed to load image: " << path << endl;
+                file >> path;
+                imageNumber[i][j] = loadImage(path);
+                if (imageNumber[i][j] == NULL)
+                {
+                    success = false;
+                    cout << "Failed to load image: " << path << endl;
+                }
             }
         }
         file >> path;
         win = loadImage(path);
         file >> path;
         lose = loadImage(path);
+        file >> path;
+        house = loadImage(path);
     }
     return success;
 }
@@ -202,12 +207,11 @@ SDL_Surface *loadImage(string path)
 }
 void playGame()
 {
-    int x, y;
-    mapInitialization(map, mapWidth, mapHeight);
-    showMapInitialization(showMap, mapWidth, mapHeight);
-    mapInitialization(tickMap, mapWidth, mapHeight);
-    randomBombMap(map, mapWidth, mapHeight, 20);
-    numberInMap(map, mapWidth, mapHeight);
+    mapInitialization(map, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
+    showMapInitialization(showMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
+    mapInitialization(tickMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
+    randomBombMap(map, gameSpecifications.mapWidth, gameSpecifications.mapHeight, gameSpecifications.numberBomb);
+    numberInMap(map, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
 }
 void showImage()
 {
@@ -217,23 +221,27 @@ void showImage()
     stretch.h = SCREEN_HEIGHT;
     stretch.w = SCREEN_WIDTH;
     SDL_BlitScaled(house, NULL, gScreenSurface, &stretch);
-    for (int i = 0; i < mapHeight; i++)
+    for (int i = 0; i < gameSpecifications.mapHeight; i++)
     {
-        for (int j = 0; j < mapWidth; j++)
+        for (int j = 0; j < gameSpecifications.mapWidth; j++)
         {
-            stretch.x = 275 + 45 * j;
-            stretch.y = 125 + 45 * i;
-            stretch.w = 45;
-            stretch.h = 45;
+            stretch.x = gameSpecifications.xStart + gameSpecifications.sizeSquare * j;
+            stretch.y = gameSpecifications.yStart + gameSpecifications.sizeSquare * i;
+            stretch.w = gameSpecifications.sizeSquare;
+            stretch.h = gameSpecifications.sizeSquare;
             if (map[i][j] >= -1 && map[i][j] <= 6)
             {
-                SDL_BlitScaled(imageNumber[showMap[i][j] + 1], NULL, gScreenSurface, &stretch);
+                SDL_BlitScaled(imageNumber[showMap[i][j] + 1][(i+j)%2], NULL, gScreenSurface, &stretch);
             }
-            if(tickMap[i][j]==1){
-                SDL_BlitScaled(co, NULL, gScreenSurface, &stretch);
-            }else{
-                if(tickMap[i][j]==2){
-                    SDL_BlitScaled(hoicham, NULL, gScreenSurface, &stretch);
+            if (tickMap[i][j] == 1)
+            {
+                SDL_BlitScaled(imageNumber[8][(i+j)%2], NULL, gScreenSurface, &stretch);
+            }
+            else
+            {
+                if (tickMap[i][j] == 2)
+                {
+                    SDL_BlitScaled(imageNumber[9][(i+j)%2], NULL, gScreenSurface, &stretch);
                 }
             }
         }
@@ -242,62 +250,79 @@ void showImage()
 void youLose()
 {
     SDL_Rect stretch;
-    stretch.x = 275;
+    for (int i = 0; i < gameSpecifications.mapHeight; i++)
+    {
+        for (int j = 0; j < gameSpecifications.mapWidth; j++)
+        {
+            if (map[i][j] == -1)
+            {
+                stretch.x = gameSpecifications.xStart + gameSpecifications.sizeSquare * j;
+                stretch.y = gameSpecifications.yStart + gameSpecifications.sizeSquare * i;
+                stretch.w = gameSpecifications.sizeSquare;
+                stretch.h = gameSpecifications.sizeSquare;
+                SDL_BlitScaled(imageNumber[10][(i+j)%2], NULL, gScreenSurface, &stretch);
+            }
+        }
+    }
+    stretch.x = gameSpecifications.xStart;
     stretch.y = 300;
     stretch.h = 100;
-    stretch.w = 450;
+    stretch.w = gameSpecifications.sizeSquare * gameSpecifications.mapWidth;
     SDL_BlitScaled(lose, NULL, gScreenSurface, &stretch);
 }
 void youWin()
 {
     SDL_Rect stretch;
-    stretch.x = 275;
+    stretch.x = gameSpecifications.xStart;
     stretch.y = 300;
     stretch.h = 100;
-    stretch.w = 450;
+    stretch.w = gameSpecifications.sizeSquare * gameSpecifications.mapWidth;
     SDL_BlitScaled(win, NULL, gScreenSurface, &stretch);
 }
 void buttonLeft(bool &check)
 {
     int x, y;
     SDL_GetMouseState(&x, &y);
-    if (x >= 275 && x <= 725 && y >= 125 && y <= 575)
+    if (x >= gameSpecifications.xStart && x <= gameSpecifications.xStart + gameSpecifications.mapWidth * gameSpecifications.sizeSquare && y >= gameSpecifications.yStart && y <= gameSpecifications.yStart + gameSpecifications.mapHeight * gameSpecifications.sizeSquare)
     {
-        x = (x - 275) / 45;
-        y = (y - 125) / 45;
-        if (checkBomb(x, y, map) && checkMap(map, showMap, mapWidth, mapHeight))
+        x = (x - gameSpecifications.xStart) / gameSpecifications.sizeSquare;
+        y = (y - gameSpecifications.yStart) / gameSpecifications.sizeSquare;
+        if (checkBomb(x, y, map))
         {
             check = false;
         }
         else
         {
-            editShowMap(x, y, map, showMap, mapWidth, mapHeight);
+            editShowMap(x, y, map, showMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
         }
         if (checkBomb(x, y, map))
         {
             showImage();
             youLose();
         }
-        /*if (checkMap(map, showMap, mapWidth, mapHeight)){
+        if (checkMap(map, showMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight))
+        {
+            check = false;
             showImage();
             youWin();
-        }*/
+        }
     }
 }
 void buttonRight()
 {
     int x, y;
     SDL_GetMouseState(&x, &y);
-    if (x >= 275 && x <= 725 && y >= 125 && y <= 575)
+    if (x >= gameSpecifications.xStart && x <= gameSpecifications.xStart + gameSpecifications.mapWidth * gameSpecifications.sizeSquare && y >= gameSpecifications.yStart && y <= gameSpecifications.yStart + gameSpecifications.mapHeight * gameSpecifications.sizeSquare)
     {
-        x = (x - 275) / 45;
-        y = (y - 125) / 45;
-        if(tickMap[y][x]==0 || tickMap[y][x]==1){
+        x = (x - gameSpecifications.xStart) / gameSpecifications.sizeSquare;
+        y = (y - gameSpecifications.yStart) / gameSpecifications.sizeSquare;
+        if (tickMap[y][x] == 0 || tickMap[y][x] == 1)
+        {
             tickMap[y][x]++;
         }
-        else{
-            tickMap[y][x]=0;
+        else
+        {
+            tickMap[y][x] = 0;
         }
     }
 }
-// hàm checkmap cần phải xem lại
