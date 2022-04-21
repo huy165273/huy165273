@@ -32,21 +32,28 @@ const int amount_image = 9;
 bool init();
 bool loadMedia();
 void close();
-void showImage();
+void showImage(SDL_Surface *image, const int &x, const int &y, const int &h, const int &w);
+void showTotalImage();
 void youLose();
 void youWin();
 void buttonLeft(bool &check);
 void buttonRight();
+bool page3(bool &quit);
+bool page2(int &diffculry, bool &checkHouse, bool &quit);
+bool page1(bool &checkHouse, bool &quit);
 
 SDL_Surface *loadImage(string path);
 SDL_Window *gWindow = NULL;
 SDL_Surface *gScreenSurface = NULL; // bề mặt của cửa sổ
 SDL_Surface *(imageNumber[11][2]);  // các ảnh số
+SDL_Surface *domin = NULL;
 SDL_Surface *house = NULL;
 SDL_Surface *win = NULL;
 SDL_Surface *lose = NULL;
+SDL_Surface *huongDan = NULL;
+SDL_Surface *play = NULL;
 
-specifications gameSpecifications = arraySpecifications[0];
+specifications gameSpecifications;
 int **map = new int *[SIZE_HEIGHT_MAX];
 int **showMap = new int *[SIZE_HEIGHT_MAX];
 int **tickMap = new int *[SIZE_HEIGHT_MAX];
@@ -54,7 +61,6 @@ void playGame();
 
 int main(int arc, char *argv[])
 {
-    playGame();
     if (!init())
     {
         cout << "Failed to init." << endl;
@@ -67,48 +73,40 @@ int main(int arc, char *argv[])
         }
         else
         {
-            bool quit = false;
-            bool check = true;
-            SDL_Event e;
+            bool checkPage1 = false, checkPage2 = false;
+            bool checkHouse = false, quit = false, playAgain = false;
+            int difficulry;
             while (!quit)
             {
-                while (SDL_PollEvent(&e) != 0)
+                if (checkHouse)
                 {
-                    // User requests quit
-                    if (e.type == SDL_QUIT)
-                    {
-                        quit = true;
-                    }
+                    checkPage1 = false;
+                    checkPage2 = false;
                 }
-                while (check)
+                if (!checkPage1 || checkHouse)
                 {
-                    while (SDL_PollEvent(&e) != 0)
+                    checkPage1 = page1(checkHouse, quit);
+                }
+                else if (!checkPage2)
+                {
+                    checkPage2 = page2(difficulry, checkHouse, quit);
+                }
+                else
+                {
+                    gameSpecifications = arraySpecifications[difficulry];
+                    do
                     {
-                        // User requests quit
-                        if (e.type == SDL_QUIT)
+                        playGame();
+                        playAgain = false;
+                        if (page3(quit))
                         {
-                            quit = true;
+                            checkHouse = true;
                         }
                         else
                         {
-                            if (e.type == SDL_MOUSEBUTTONDOWN)
-                            {
-                                if (e.button.button == SDL_BUTTON_LEFT)
-                                {
-                                    buttonLeft(check);
-                                }
-                                if (e.button.button == SDL_BUTTON_RIGHT)
-                                {
-                                    buttonRight();
-                                }
-                            }
+                            playAgain = true;
                         }
-                        if (check)
-                            showImage();
-                        SDL_UpdateWindowSurface(gWindow);
-                    }
-                    if (quit)
-                        break;
+                    } while (playAgain);
                 }
             }
         }
@@ -149,7 +147,7 @@ void close()
         for (int j = 0; j < 2; j++)
         {
             SDL_FreeSurface(imageNumber[i][j]);
-            imageNumber[i][j]= NULL;
+            imageNumber[i][j] = NULL;
         }
     }
     SDL_DestroyWindow(gWindow);
@@ -186,7 +184,13 @@ bool loadMedia()
         file >> path;
         lose = loadImage(path);
         file >> path;
+        domin = loadImage(path);
+        file >> path;
         house = loadImage(path);
+        file >> path;
+        huongDan = loadImage(path);
+        file >> path;
+        play = loadImage(path);
     }
     return success;
 }
@@ -213,36 +217,36 @@ void playGame()
     randomBombMap(map, gameSpecifications.mapWidth, gameSpecifications.mapHeight, gameSpecifications.numberBomb);
     numberInMap(map, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
 }
-void showImage()
+void showImage(SDL_Surface *image, const int &x, const int &y, const int &h, const int &w)
 {
     SDL_Rect stretch;
-    stretch.x = 0;
-    stretch.y = 0;
-    stretch.h = SCREEN_HEIGHT;
-    stretch.w = SCREEN_WIDTH;
-    SDL_BlitScaled(house, NULL, gScreenSurface, &stretch);
+    stretch.x = x;
+    stretch.y = y;
+    stretch.h = h;
+    stretch.w = w;
+    SDL_BlitScaled(image, NULL, gScreenSurface, &stretch);
+}
+void showTotalImage()
+{
+    showImage(domin, 0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
     for (int i = 0; i < gameSpecifications.mapHeight; i++)
     {
         for (int j = 0; j < gameSpecifications.mapWidth; j++)
         {
-            stretch.x = gameSpecifications.xStart + gameSpecifications.sizeSquare * j;
-            stretch.y = gameSpecifications.yStart + gameSpecifications.sizeSquare * i;
-            stretch.w = gameSpecifications.sizeSquare;
-            stretch.h = gameSpecifications.sizeSquare;
-            if (map[i][j] >= -1 && map[i][j] <= 6)
+            int x = gameSpecifications.xStart + gameSpecifications.sizeSquare * j;
+            int y = gameSpecifications.yStart + gameSpecifications.sizeSquare * i;
+            int w = gameSpecifications.sizeSquare;
+            int h = gameSpecifications.sizeSquare;
+            showImage(imageNumber[showMap[i][j] + 1][(i + j) % 2], x, y, h, w);
+            if (tickMap[i][j] == 1 && showMap[i][j] == -1)
             {
-                SDL_BlitScaled(imageNumber[showMap[i][j] + 1][(i+j)%2], NULL, gScreenSurface, &stretch);
-            }
-            if (tickMap[i][j] == 1)
-            {
-                SDL_BlitScaled(imageNumber[8][(i+j)%2], NULL, gScreenSurface, &stretch);
+                showImage(imageNumber[8][(i + j) % 2], x, y, h, w);
             }
             else
+
+                if (tickMap[i][j] == 2 && showMap[i][j] == -1)
             {
-                if (tickMap[i][j] == 2)
-                {
-                    SDL_BlitScaled(imageNumber[9][(i+j)%2], NULL, gScreenSurface, &stretch);
-                }
+                showImage(imageNumber[9][(i + j) % 2], x, y, h, w);
             }
         }
     }
@@ -260,7 +264,7 @@ void youLose()
                 stretch.y = gameSpecifications.yStart + gameSpecifications.sizeSquare * i;
                 stretch.w = gameSpecifications.sizeSquare;
                 stretch.h = gameSpecifications.sizeSquare;
-                SDL_BlitScaled(imageNumber[10][(i+j)%2], NULL, gScreenSurface, &stretch);
+                SDL_BlitScaled(imageNumber[10][(i + j) % 2], NULL, gScreenSurface, &stretch);
             }
         }
     }
@@ -279,7 +283,7 @@ void youWin()
     stretch.w = gameSpecifications.sizeSquare * gameSpecifications.mapWidth;
     SDL_BlitScaled(win, NULL, gScreenSurface, &stretch);
 }
-void buttonLeft(bool &check)
+/*void buttonLeft(bool &check)
 {
     int x, y;
     SDL_GetMouseState(&x, &y);
@@ -297,17 +301,17 @@ void buttonLeft(bool &check)
         }
         if (checkBomb(x, y, map))
         {
-            showImage();
+            showTotalImage();
             youLose();
         }
         if (checkMap(map, showMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight))
         {
             check = false;
-            showImage();
+            showTotalImage();
             youWin();
         }
     }
-}
+}*/
 void buttonRight()
 {
     int x, y;
@@ -324,5 +328,186 @@ void buttonRight()
         {
             tickMap[y][x] = 0;
         }
+    }
+}
+bool page1(bool &checkHouse, bool &quit)
+{
+    checkHouse = false;
+    bool pageHouse = true;
+    SDL_Event e;
+    while (true)
+    {
+        while (SDL_PollEvent(&e) != 0)
+        {
+            // User requests quit
+            if (e.type == SDL_QUIT)
+            {
+                quit = true;
+            }
+            else
+            {
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    int x, y;
+                    SDL_GetMouseState(&x, &y);
+                    if (pageHouse)
+                    {
+                        if (x >= 300 && x <= 700 && y >= 250 && y <= 350)
+                        {
+                            return true;
+                        }
+                        else if (x >= 300 && x <= 700 && y >= 400 && y <= 500)
+                        {
+                            pageHouse = false;
+                        }
+                    }
+                    else
+                    {
+                        if (x >= 850 && x <= 925 && y >= 25 && y <= 100)
+                        {
+                            pageHouse = true;
+                        }
+                    }
+                }
+            }
+            if (pageHouse)
+            {
+                showImage(house, 0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
+            }
+            else
+            {
+                showImage(huongDan, 0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
+            }
+            SDL_UpdateWindowSurface(gWindow);
+        }
+        if (quit)
+            break;
+    }
+}
+bool page2(int &difficulry, bool &checkHouse, bool &quit)
+{
+    SDL_Event e;
+    while (true)
+    {
+        while (SDL_PollEvent(&e) != 0)
+        {
+            // User requests quit
+            if (e.type == SDL_QUIT)
+            {
+                quit = true;
+            }
+            else
+            {
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    int x, y;
+                    SDL_GetMouseState(&x, &y);
+                    if (x >= 400 && x <= 600 && y >= 275 && y <= 325)
+                    {
+                        difficulry = 0;
+                        return true;
+                    }
+                    if (x >= 400 && x <= 600 && y >= 350 && y <= 400)
+                    {
+                        difficulry = 1;
+                        return true;
+                    }
+                    if (x >= 400 && x <= 600 && y >= 425 && y <= 475)
+                    {
+                        difficulry = 2;
+                        return true;
+                    }
+                    if (x >= 400 && x <= 600 && y >= 425 && y <= 475)
+                    {
+                        difficulry = 3;
+                        return true;
+                    }
+                    if (x >= 850 && x <= 925 && y >= 25 && y <= 100)
+                    {
+                        checkHouse = true;
+                        return true;
+                    }
+                }
+            }
+            showImage(play, 0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
+            SDL_UpdateWindowSurface(gWindow);
+        }
+        if (quit)
+            break;
+    }
+}
+bool page3(bool &quit)
+{
+    bool check = true;
+    SDL_Event e;
+    while (true)
+    {
+        while (SDL_PollEvent(&e) != 0)
+        {
+            if (e.type == SDL_QUIT)
+            {
+                quit = true;
+            }
+            else
+            {
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    if (e.button.button == SDL_BUTTON_LEFT)
+                    {
+                        int x, y;
+                        SDL_GetMouseState(&x, &y);
+                        if (x >= gameSpecifications.xStart && x <= gameSpecifications.xStart + gameSpecifications.mapWidth * gameSpecifications.sizeSquare && y >= gameSpecifications.yStart && y <= gameSpecifications.yStart + gameSpecifications.mapHeight * gameSpecifications.sizeSquare)
+                        {
+                            x = (x - gameSpecifications.xStart) / gameSpecifications.sizeSquare;
+                            y = (y - gameSpecifications.yStart) / gameSpecifications.sizeSquare;
+                            if (tickMap[y][x] != 1)
+                            {
+                                if (checkBomb(x, y, map))
+                                {
+                                    if (check)
+                                    {
+                                        showTotalImage();
+                                        youLose();
+                                    }
+                                    check = false;
+                                }
+                                else
+                                {
+                                    editShowMap(x, y, map, showMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
+                                }
+                                if (checkMap(map, showMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight))
+                                {
+                                    check = false;
+                                    showTotalImage();
+                                    youWin();
+                                }
+                            }
+                        }
+                        if (x >= 850 && x <= 925 && y >= 25 && y <= 100)
+                        {
+                            return true;
+                        }
+                        if (x >= 750 && x <= 825 && y >= 25 && y <= 100)
+                        {
+                            return false;
+                        }
+                    }
+                    if (e.button.button == SDL_BUTTON_RIGHT)
+                    {
+                        buttonRight();
+                    }
+                }
+            }
+            if (check)
+                showTotalImage();
+            else
+            {
+                SDL_UpdateWindowSurface(gWindow);
+                break;
+            }
+            SDL_UpdateWindowSurface(gWindow);
+        }
+        if (quit)
+            break;
     }
 }
