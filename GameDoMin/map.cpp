@@ -26,9 +26,9 @@ void showMapInitialization(int **showMap, const int mapWidth, const int mapHeigh
 void randomBombMap(int **map, const int mapWidth, const int mapHeight, const int amountBomb)
 {
     int count = 1;
+    srand(time(nullptr));
     while (count <= amountBomb)
     {
-        srand(time(nullptr));
         int x = rand() % mapHeight;
         int y = rand() % mapWidth;
         if (map[x][y] == 0)
@@ -81,18 +81,18 @@ void numberInMap(int **map, int mapWidth, int mapHeight)
     }
 }
 bool checkBomb(int x, int y, int **map){
-    if(map[x][y]==-1) return true;
+    if(map[y][x]==-1) return true;
     return false;
 }
 void editShowMap(int x, int y, int **map, int **showMap, int mapWidth, int mapHeight)
 {
-    if(map[x][y]>0) showMap[x][y]=map[x][y];
+    if(map[y][x]>0) showMap[y][x]=map[y][x];
     else{
-        showMap[x][y]=0;
-        for(int i=x-1;i<=x+1;i++)
-            for(int j=y-1;j<=y+1;j++){
-                if(i>=0 && i<mapHeight && j>=0 && j<mapWidth && (i!=x || j!=y)) 
-                    if(showMap[i][j]==-1) editShowMap(i, j, map, showMap, mapWidth, mapHeight);
+        showMap[y][x]=0;
+        for(int i=y-1;i<=y+1;i++)
+            for(int j=x-1;j<=x+1;j++){
+                if(i>=0 && i<mapHeight && j>=0 && j<mapWidth && (i!=y || j!=x)) 
+                    if(showMap[i][j]==-1) editShowMap(j, i, map, showMap, mapWidth, mapHeight);
             }
     }
 }
