@@ -40,6 +40,8 @@ bool page3(bool &quit);
 void buttonRight();
 void youLose();
 void youWin();
+void writeTimeGameMin();
+void readTimeGameMin();
 
 specifications gameSpecifications;
 int **map = new int *[SIZE_HEIGHT_MAX];
@@ -48,6 +50,8 @@ int **tickMap = new int *[SIZE_HEIGHT_MAX];
 int flagNumber;
 int timeGame;
 int Time;
+int difficulry;
+int timeMin[4];
 
 int main(int arc, char *argv[])
 {
@@ -65,7 +69,6 @@ int main(int arc, char *argv[])
         {
             bool checkPage1 = false, checkPage2 = false;
             bool checkHouse = false, quit = false, playAgain = false;
-            int difficulry;
             while (!quit)
             {
                 if (checkHouse)
@@ -99,7 +102,6 @@ int main(int arc, char *argv[])
                     } while (playAgain);
                 }
             }
-            // if(domin!=NULL) cout<<"huy";
         }
     }
     SDLCommonFunction::close();
@@ -109,17 +111,12 @@ int main(int arc, char *argv[])
 void showTotalImage()
 {
     SDLCommonFunction::showImage(domin, 0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
-    string numberText = to_string(flagNumber);
-    fontText = TTF_RenderText_Solid(gFontText, numberText.c_str(), {255, 0, 0});
-    SDL_Rect stretch;
-    stretch.x = 685;
-    stretch.y = 55;
-    SDL_BlitSurface(fontText, NULL, gScreenSurface, &stretch);
-    string timeText = to_string(timeGame) + " s";
-    fontText = TTF_RenderText_Solid(gFontText, timeText.c_str(), {255, 0, 0});
-    stretch.x = 435;
-    stretch.y = 55;
-    SDL_BlitSurface(fontText, NULL, gScreenSurface, &stretch);
+    SDLCommonFunction::showText(flagNumber, 685, 55);
+    SDLCommonFunction::showText(timeGame, 435, 55);
+    if (timeMin[difficulry] != 9999)
+    {
+        SDLCommonFunction::showText(timeMin[difficulry], 565, 55);
+    }
     for (int i = 0; i < gameSpecifications.mapHeight; i++)
     {
         for (int j = 0; j < gameSpecifications.mapWidth; j++)
@@ -260,7 +257,9 @@ bool page2(int &difficulry, bool &checkHouse, bool &quit)
 }
 bool page3(bool &quit)
 {
-    int timeGameStart =Time;
+    readTimeGameMin();
+    Time = SDL_GetTicks() / 1000;
+    int timeGameStart = Time;
     flagNumber = gameSpecifications.numberBomb;
     bool check = true;
     SDL_Event e;
@@ -332,16 +331,12 @@ bool page3(bool &quit)
             }
             SDL_UpdateWindowSurface(gWindow);
         }
-        //timeGame = SDL_GetTicks() / 1000;
-        Time = SDL_GetTicks() / 1000;
+        // timeGame = SDL_GetTicks() / 1000;
+        if (check)
+            Time = SDL_GetTicks() / 1000;
         timeGame = Time - timeGameStart;
         SDLCommonFunction::showImage(trong, 430, 50, 50, 50);
-        string timeText = to_string(timeGame) + " s";
-        fontText = TTF_RenderText_Solid(gFontText, timeText.c_str(), {255, 0, 0});
-        SDL_Rect stretch;
-        stretch.x = 435;
-        stretch.y = 55;
-        SDL_BlitSurface(fontText, NULL, gScreenSurface, &stretch);
+        SDLCommonFunction::showText(timeGame, 435, 55);
         SDL_UpdateWindowSurface(gWindow);
         if (quit)
             break;
@@ -407,4 +402,45 @@ void youWin()
     stretch.h = 100;
     stretch.w = gameSpecifications.sizeSquare * gameSpecifications.mapWidth;
     SDL_BlitScaled(win, NULL, gScreenSurface, &stretch);
+    if (timeMin[difficulry] > Time)
+    {
+        timeMin[difficulry] = timeGame;
+    }
+    writeTimeGameMin();
+}
+void readTimeGameMin()
+{
+    string path;
+    ifstream file;
+    file.open("time_game_min.txt");
+    if (!file)
+    {
+        cout << "Failed to open file." << endl;
+    }
+    else
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            file >> timeMin[i];
+        }
+    }
+    file.close();
+}
+void writeTimeGameMin()
+{
+    string path;
+    ofstream file;
+    file.open("time_game_min.txt", ios::out | ios::trunc);
+    if (!file)
+    {
+        cout << "Failed to open file." << endl;
+    }
+    else
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            file << timeMin[i] << endl;
+        }
+    }
+    file.close();
 }
