@@ -32,6 +32,23 @@ bool SDLCommonFunction::init()
     {
         success = false;
     }
+
+    if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
+    {
+        success = false;
+    }
+
+    // read file wav audio
+    gSoundClick[0] = Mix_LoadWAV("sound/mouse-click.wav");
+    gSoundClick[1] = Mix_LoadWAV("sound/mixkit-arcade.wav");
+    gSoundClick[2] = Mix_LoadWAV("sound/mixkit-retro.wav");
+    gSoundBomb = Mix_LoadWAV("sound/Bomb.wav");
+    gSoundWin = Mix_LoadWAV("sound/sound-win.wav");
+    gSoundLose= Mix_LoadWAV("sound/sound-lose.wav");
+    if ( gSoundBomb == NULL || gSoundWin == NULL || gSoundLose==NULL)
+    {
+        success = false;
+    }
     return success;
 }
 void SDLCommonFunction::close()
@@ -39,15 +56,19 @@ void SDLCommonFunction::close()
     SDL_FreeSurface(house);
     house = NULL;
     SDL_FreeSurface(domin);
-    domin=NULL;
+    domin = NULL;
     SDL_FreeSurface(huongDan);
-    huongDan=NULL;
+    huongDan = NULL;
     SDL_FreeSurface(gameDifficulry);
-    gameDifficulry=NULL;
+    gameDifficulry = NULL;
     SDL_FreeSurface(win);
-    win=NULL;
+    win = NULL;
     SDL_FreeSurface(lose);
-    lose=NULL;
+    lose = NULL;
+    SDL_FreeSurface(trong);
+    trong = NULL;
+    SDL_FreeSurface(soundOff);
+    soundOff = NULL;
     for (int i = 0; i < 11; i++)
     {
         for (int j = 0; j < 2; j++)
@@ -56,8 +77,16 @@ void SDLCommonFunction::close()
             imageNumber[i][j] = NULL;
         }
     }
+    Mix_FreeChunk(gSoundBomb);
+    gSoundBomb = NULL;
+    for (int i = 0; i < 3; i++)
+    {
+        Mix_FreeChunk(gSoundClick[i]);
+        gSoundClick[i] = NULL;
+    }
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
+    Mix_CloseAudio();
     SDL_Quit();
 }
 bool SDLCommonFunction::loadMedia()
@@ -99,11 +128,13 @@ bool SDLCommonFunction::loadMedia()
         gameDifficulry = SDLCommonFunction::loadImage(path);
         file >> path;
         trong = SDLCommonFunction::loadImage(path);
-        //if(domin!=NULL) cout<<"huy ";
+        file >> path;
+        soundOff = SDLCommonFunction::loadImage(path);
+        // if(domin!=NULL) cout<<"huy ";
     }
     return success;
 }
-SDL_Surface * SDLCommonFunction::loadImage(string path)
+SDL_Surface *SDLCommonFunction::loadImage(string path)
 {
     SDL_Surface *optimizeSurface = NULL;
     SDL_Surface *loadSurface = SDL_LoadBMP(path.c_str());
@@ -127,11 +158,12 @@ void SDLCommonFunction::showImage(SDL_Surface *image, const int &x, const int &y
     stretch.w = w;
     SDL_BlitScaled(image, NULL, gScreenSurface, &stretch);
 }
-void SDLCommonFunction::showText(int timeGame, const int&x, const int &y){
+void SDLCommonFunction::showText(int timeGame, const int &x, const int &y)
+{
     SDL_Rect stretch;
     stretch.x = x;
     stretch.y = y;
-    string strTime= to_string(timeGame);
+    string strTime = to_string(timeGame);
     fontText = TTF_RenderText_Solid(gFontText, strTime.c_str(), {255, 0, 0});
     SDL_BlitSurface(fontText, NULL, gScreenSurface, &stretch);
 }

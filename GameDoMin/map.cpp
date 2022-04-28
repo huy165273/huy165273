@@ -84,15 +84,3 @@ bool checkBomb(int x, int y, int **map){
     if(map[y][x]==-1) return true;
     return false;
 }
-void editShowMap(int x, int y, int **map, int **showMap, int mapWidth, int mapHeight)
-{
-    if(map[y][x]>0) showMap[y][x]=map[y][x];
-    else{
-        showMap[y][x]=0;
-        for(int i=y-1;i<=y+1;i++)
-            for(int j=x-1;j<=x+1;j++){
-                if(i>=0 && i<mapHeight && j>=0 && j<mapWidth && (i!=y || j!=x)) 
-                    if(showMap[i][j]==-1) editShowMap(j, i, map, showMap, mapWidth, mapHeight);
-            }
-    }
-}
