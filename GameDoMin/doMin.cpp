@@ -1,41 +1,6 @@
 #include "Common_Function.h"
 #include "map.h"
 using namespace std;
-struct specifications
-{
-    int xStart;
-    int yStart;
-    int mapHeight;
-    int mapWidth;
-    int sizeSquare;
-    int numberBomb;
-    specifications(int xStart_, int yStart_, int mapHeight_, int mapWidth_, int sizeSquare_, int numberBomb_)
-        : xStart(xStart_), yStart(yStart_), mapHeight(mapHeight_), mapWidth(mapWidth_), sizeSquare(sizeSquare_), numberBomb(numberBomb_) {}
-    specifications(){};
-};
-
-const specifications arraySpecifications[4] = {{275, 125, 10, 10, 45, 10},
-                                               {100, 150, 10, 20, 40, 30},
-                                               {200, 125, 15, 20, 30, 60},
-                                               {50, 125, 15, 30, 30, 99}};
-
-SDL_Window *gWindow = NULL;
-SDL_Surface *gScreenSurface = NULL; // bề mặt của cửa sổ
-SDL_Surface *(imageNumber[11][2]);
-SDL_Surface *domin = NULL;
-SDL_Surface *house = NULL;
-SDL_Surface *win = NULL;
-SDL_Surface *lose = NULL;
-SDL_Surface *huongDan = NULL;
-SDL_Surface *gameDifficulry = NULL;
-SDL_Surface *trong = NULL;
-SDL_Surface *soundOff = NULL;
-TTF_Font *gFontText = NULL;
-SDL_Surface *fontText = NULL;
-Mix_Chunk *gSoundClick[3];
-Mix_Chunk *gSoundBomb = NULL;
-Mix_Chunk *gSoundWin = NULL;
-Mix_Chunk *gSoundLose = NULL;
 
 void showTotalImage();
 void startGame();
@@ -48,17 +13,13 @@ void youWin(const bool &checkSound);
 void writeTimeGameMin();
 void readTimeGameMin();
 void DeleteMap(int **map, int SIZE_HEIGHT_MAX);
-void editShowMap(int x, int y, int **map, int **showMap, int mapWidth, int mapHeight);
 
-specifications gameSpecifications;
-int **map = new int *[SIZE_HEIGHT_MAX];
-int **showMap = new int *[SIZE_HEIGHT_MAX];
-int **tickMap = new int *[SIZE_HEIGHT_MAX];
-int flagNumber;
 int timeGame;
 int Time;
 int difficulry;
 int timeMin[4];
+int flagNumber;
+specifications gameSpecifications;
 
 int main(int arc, char *argv[])
 {
@@ -118,14 +79,6 @@ int main(int arc, char *argv[])
     SDLCommonFunction::close();
     return 0;
 }
-void DeleteMap(int **map, int SIZE_HEIGHT_MAX)
-{
-    for (int i = 0; i < SIZE_HEIGHT_MAX; i++)
-    {
-        delete[] map[i];
-    }
-    delete[] * map;
-}
 void showTotalImage()
 {
     SDLCommonFunction::showImage(domin, 0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
@@ -159,11 +112,11 @@ void showTotalImage()
 }
 void startGame()
 {
-    mapInitialization(map, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
-    showMapInitialization(showMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
-    mapInitialization(tickMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
-    randomBombMap(map, gameSpecifications.mapWidth, gameSpecifications.mapHeight, gameSpecifications.numberBomb);
-    numberInMap(map, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
+    mapInitialization(map);
+    showMapInitialization( );
+    mapInitialization(tickMap);
+    randomBombMap();
+    numberInMap();
 }
 bool page1(bool &checkHouse, bool &checkSound, bool &quit)
 {
@@ -317,11 +270,11 @@ bool page3(bool &quit, const bool &checkSound)
                             y = (y - gameSpecifications.yStart) / gameSpecifications.sizeSquare;
                             if (tickMap[y][x] != 1)
                             {
-                                if (checkBomb(x, y, map))
+                                if (checkBomb(x, y))
                                 {
                                     if (check)
                                     {
-                                        youLose(x, y,checkSound);
+                                        youLose(x, y, checkSound);
                                     }
                                     check = false;
                                 }
@@ -338,9 +291,9 @@ bool page3(bool &quit, const bool &checkSound)
                                             Mix_PlayChannel(-1, gSoundClick[2], 0);
                                         }
                                     }
-                                    editShowMap(x, y, map, showMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight);
+                                    editShowMap(x, y);
                                 }
-                                if (checkMap(map, showMap, gameSpecifications.mapWidth, gameSpecifications.mapHeight))
+                                if (checkMap())
                                 {
                                     check = false;
                                     showTotalImage();
@@ -350,10 +303,18 @@ bool page3(bool &quit, const bool &checkSound)
                         }
                         if (x >= 850 && x <= 925 && y >= 25 && y <= 100)
                         {
+                            if (checkSound)
+                            {
+                                Mix_PlayChannel(-1, gSoundClick[0], 0);
+                            }
                             return true;
                         }
                         if (x >= 750 && x <= 825 && y >= 25 && y <= 100)
                         {
+                            if (checkSound)
+                            {
+                                Mix_PlayChannel(-1, gSoundClick[0], 0);
+                            }
                             return false;
                         }
                     }
@@ -386,7 +347,8 @@ void buttonRight(const bool &checkSound)
         y = (y - gameSpecifications.yStart) / gameSpecifications.sizeSquare;
         if (showMap[y][x] == -1)
         {
-            if(checkSound){
+            if (checkSound)
+            {
                 Mix_PlayChannel(-1, gSoundClick[0], 0);
             }
             switch (tickMap[y][x])
@@ -419,7 +381,8 @@ void youLose(const int &x, const int &y, const bool &checkSound)
     stretch.w = gameSpecifications.sizeSquare;
     stretch.h = gameSpecifications.sizeSquare;
     SDL_BlitScaled(imageNumber[10][(x + y) % 2], NULL, gScreenSurface, &stretch);
-    if(checkSound){
+    if (checkSound)
+    {
         Mix_PlayChannel(-1, gSoundBomb, 0);
     }
     SDL_UpdateWindowSurface(gWindow);
@@ -436,7 +399,8 @@ void youLose(const int &x, const int &y, const bool &checkSound)
                 stretch.h = gameSpecifications.sizeSquare;
                 SDL_BlitScaled(imageNumber[10][(i + j) % 2], NULL, gScreenSurface, &stretch);
                 SDL_UpdateWindowSurface(gWindow);
-                if(checkSound){
+                if (checkSound)
+                {
                     Mix_PlayChannel(-1, gSoundBomb, 0);
                 }
                 SDL_Delay(500);
@@ -448,13 +412,15 @@ void youLose(const int &x, const int &y, const bool &checkSound)
     stretch.h = 100;
     stretch.w = gameSpecifications.sizeSquare * gameSpecifications.mapWidth;
     SDL_BlitScaled(lose, NULL, gScreenSurface, &stretch);
-    if(checkSound){
+    if (checkSound)
+    {
         Mix_PlayChannel(-1, gSoundLose, 0);
     }
 }
 void youWin(const bool &checkSound)
 {
-    if(checkSound){
+    if (checkSound)
+    {
         Mix_PlayChannel(-1, gSoundWin, 0);
     }
     SDL_Rect stretch;
@@ -505,22 +471,4 @@ void writeTimeGameMin()
     }
     file.close();
 }
-void editShowMap(int x, int y, int **map, int **showMap, int mapWidth, int mapHeight)
-{
-    SDLCommonFunction::showImage(imageNumber[map[y][x] + 1][(x + y) % 2], gameSpecifications.xStart + gameSpecifications.sizeSquare * x, gameSpecifications.yStart + gameSpecifications.sizeSquare * y, gameSpecifications.sizeSquare, gameSpecifications.sizeSquare);
-    SDL_UpdateWindowSurface(gWindow);
-    SDL_Delay(25);
-    if (map[y][x] > 0)
-        showMap[y][x] = map[y][x];
-    else
-    {
-        showMap[y][x] = 0;
-        for (int i = y - 1; i <= y + 1; i++)
-            for (int j = x - 1; j <= x + 1; j++)
-            {
-                if (i >= 0 && i < mapHeight && j >= 0 && j < mapWidth && (i != y || j != x))
-                    if (showMap[i][j] == -1)
-                        editShowMap(j, i, map, showMap, mapWidth, mapHeight);
-            }
-    }
-}
+

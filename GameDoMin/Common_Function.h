@@ -5,8 +5,7 @@
 #include <fstream>
 #include <SDL2/SDL.h>
 #include<SDL2/SDL_ttf.h>
-
-using namespace std;
+#include<SDL2/SDL_mixer.h>
 
 static const int SIZE_HEIGHT_MAX = 15;
 static const int SCREEN_WIDTH = 1000;
@@ -22,9 +21,15 @@ static const int SCREEN_HEIGHT = 600;
  extern SDL_Surface *huongDan ;
  extern SDL_Surface *gameDifficulry;
  extern SDL_Surface *trong;
+ extern SDL_Surface *soundOff;
  extern SDL_Surface *fontText;
  extern TTF_Font *gFontText ;
+ extern Mix_Chunk * gSoundClick[3];
+ extern Mix_Chunk * gSoundBomb;
+ extern Mix_Chunk *gSoundWin;
+ extern Mix_Chunk *gSoundLose;
 
+ using namespace std;
 namespace SDLCommonFunction
 {
     bool init();

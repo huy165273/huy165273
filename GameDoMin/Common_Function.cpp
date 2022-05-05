@@ -1,5 +1,23 @@
 #include "Common_Function.h"
 
+SDL_Window *gWindow = NULL;
+SDL_Surface *gScreenSurface = NULL; // bề mặt của cửa sổ
+SDL_Surface *(imageNumber[11][2]);
+SDL_Surface *domin = NULL;
+SDL_Surface *house = NULL;
+SDL_Surface *win = NULL;
+SDL_Surface *lose = NULL;
+SDL_Surface *huongDan = NULL;
+SDL_Surface *gameDifficulry = NULL;
+SDL_Surface *trong = NULL;
+SDL_Surface *soundOff = NULL;
+TTF_Font *gFontText = NULL;
+SDL_Surface *fontText = NULL;
+Mix_Chunk *gSoundClick[3];
+Mix_Chunk *gSoundBomb = NULL;
+Mix_Chunk *gSoundWin = NULL;
+Mix_Chunk *gSoundLose = NULL;
+
 bool SDLCommonFunction::init()
 {
     bool success = true;
