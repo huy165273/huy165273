@@ -1,9 +1,12 @@
 #ifndef MAP_H_INCLUDE
 #define MAP_H_INCLUDE
 
+#include "Image.h"
+
 extern int **map ;
 extern int **showMap ;
 extern int **tickMap ;
+extern Image(imageNumber[11][2]);
 struct specifications
 {
     int xStart;
@@ -29,6 +32,6 @@ bool checkMap();
 void numberInMap();
 bool checkBomb(int x, int y);
 void editShowMap(int x, int y);
-void DeleteMap(int **map, int SIZE_HEIGHT_MAX);
+void DeleteMap();
 
 #endif

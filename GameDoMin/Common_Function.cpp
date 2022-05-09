@@ -2,15 +2,7 @@
 
 SDL_Window *gWindow = NULL;
 SDL_Surface *gScreenSurface = NULL; // bề mặt của cửa sổ
-SDL_Surface *(imageNumber[11][2]);
-SDL_Surface *domin = NULL;
-SDL_Surface *house = NULL;
-SDL_Surface *win = NULL;
-SDL_Surface *lose = NULL;
-SDL_Surface *huongDan = NULL;
-SDL_Surface *gameDifficulry = NULL;
-SDL_Surface *trong = NULL;
-SDL_Surface *soundOff = NULL;
+
 TTF_Font *gFontText = NULL;
 SDL_Surface *fontText = NULL;
 Mix_Chunk *gSoundClick[3];
@@ -71,30 +63,6 @@ bool SDLCommonFunction::init()
 }
 void SDLCommonFunction::close()
 {
-    SDL_FreeSurface(house);
-    house = NULL;
-    SDL_FreeSurface(domin);
-    domin = NULL;
-    SDL_FreeSurface(huongDan);
-    huongDan = NULL;
-    SDL_FreeSurface(gameDifficulry);
-    gameDifficulry = NULL;
-    SDL_FreeSurface(win);
-    win = NULL;
-    SDL_FreeSurface(lose);
-    lose = NULL;
-    SDL_FreeSurface(trong);
-    trong = NULL;
-    SDL_FreeSurface(soundOff);
-    soundOff = NULL;
-    for (int i = 0; i < 11; i++)
-    {
-        for (int j = 0; j < 2; j++)
-        {
-            SDL_FreeSurface(imageNumber[i][j]);
-            imageNumber[i][j] = NULL;
-        }
-    }
     Mix_FreeChunk(gSoundBomb);
     gSoundBomb = NULL;
     for (int i = 0; i < 3; i++)
@@ -102,56 +70,14 @@ void SDLCommonFunction::close()
         Mix_FreeChunk(gSoundClick[i]);
         gSoundClick[i] = NULL;
     }
+    SDL_FreeSurface(gScreenSurface);
+    gScreenSurface = NULL;
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
     Mix_CloseAudio();
     SDL_Quit();
 }
-bool SDLCommonFunction::loadMedia()
-{
-    bool success = true;
-    string path;
-    ifstream file;
-    file.open("file_image.txt");
-    if (!file)
-    {
-        cout << "Failed to open file." << endl;
-    }
-    else
-    {
-        for (int i = 0; i < 11; i++)
-        {
-            for (int j = 0; j < 2; j++)
-            {
-                file >> path;
-                imageNumber[i][j] = SDLCommonFunction::loadImage(path);
-                if (imageNumber[i][j] == NULL)
-                {
-                    success = false;
-                    cout << "Failed to load image: " << path << endl;
-                }
-            }
-        }
-        file >> path;
-        win = SDLCommonFunction::loadImage(path);
-        file >> path;
-        lose = SDLCommonFunction::loadImage(path);
-        file >> path;
-        domin = SDLCommonFunction::loadImage(path);
-        file >> path;
-        house = SDLCommonFunction::loadImage(path);
-        file >> path;
-        huongDan = SDLCommonFunction::loadImage(path);
-        file >> path;
-        gameDifficulry = SDLCommonFunction::loadImage(path);
-        file >> path;
-        trong = SDLCommonFunction::loadImage(path);
-        file >> path;
-        soundOff = SDLCommonFunction::loadImage(path);
-        // if(domin!=NULL) cout<<"huy ";
-    }
-    return success;
-}
+
 SDL_Surface *SDLCommonFunction::loadImage(string path)
 {
     SDL_Surface *optimizeSurface = NULL;
@@ -184,4 +110,10 @@ void SDLCommonFunction::showText(int timeGame, const int &x, const int &y)
     string strTime = to_string(timeGame);
     fontText = TTF_RenderText_Solid(gFontText, strTime.c_str(), {255, 0, 0});
     SDL_BlitSurface(fontText, NULL, gScreenSurface, &stretch);
+}
+void SDLCommonFunction::showSound(Mix_Chunk *gSoundl, const bool &checkSound){
+    if (checkSound)
+    {
+        Mix_PlayChannel(-1, gSoundl, 0);
+    }
 }

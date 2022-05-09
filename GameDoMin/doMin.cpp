@@ -1,8 +1,7 @@
 #include "Common_Function.h"
-#include "map.h"
+#include "Handling_Image.h"
 using namespace std;
 
-void showTotalImage();
 void startGame();
 bool page1(bool &checkHouse, bool &checkSound, bool &quit);
 bool page2(int &diffculry, bool &checkHouse, const bool &checkSound, bool &quit);
@@ -10,14 +9,10 @@ bool page3(bool &quit, const bool &checkSound);
 void buttonRight(const bool &checkSound);
 void youLose(const int &x, const int &y, const bool &checkSound);
 void youWin(const bool &checkSound);
-void writeTimeGameMin();
-void readTimeGameMin();
-void DeleteMap(int **map, int SIZE_HEIGHT_MAX);
 
 int timeGame;
 int Time;
 int difficulry;
-int timeMin[4];
 int flagNumber;
 specifications gameSpecifications;
 
@@ -29,7 +24,7 @@ int main(int arc, char *argv[])
     }
     else
     {
-        if (!SDLCommonFunction::loadMedia())
+        if (!loadMedia())
         {
             cout << "Failed to load media." << endl;
         }
@@ -73,47 +68,16 @@ int main(int arc, char *argv[])
             }
         }
     }
-    DeleteMap(map, SIZE_HEIGHT_MAX);
-    DeleteMap(showMap, SIZE_HEIGHT_MAX);
-    DeleteMap(tickMap, SIZE_HEIGHT_MAX);
+    DeleteMap();
+    closeImage();
     SDLCommonFunction::close();
     return 0;
 }
-void showTotalImage()
-{
-    SDLCommonFunction::showImage(domin, 0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
-    SDLCommonFunction::showText(flagNumber, 685, 55);
-    SDLCommonFunction::showText(timeGame, 435, 55);
-    if (timeMin[difficulry] != 9999)
-    {
-        SDLCommonFunction::showText(timeMin[difficulry], 565, 55);
-    }
-    for (int i = 0; i < gameSpecifications.mapHeight; i++)
-    {
-        for (int j = 0; j < gameSpecifications.mapWidth; j++)
-        {
-            int x = gameSpecifications.xStart + gameSpecifications.sizeSquare * j;
-            int y = gameSpecifications.yStart + gameSpecifications.sizeSquare * i;
-            int w = gameSpecifications.sizeSquare;
-            int h = gameSpecifications.sizeSquare;
-            SDLCommonFunction::showImage(imageNumber[showMap[i][j] + 1][(i + j) % 2], x, y, h, w);
-            if (tickMap[i][j] == 1 && showMap[i][j] == -1)
-            {
-                SDLCommonFunction::showImage(imageNumber[8][(i + j) % 2], x, y, h, w);
-            }
-            else
 
-                if (tickMap[i][j] == 2 && showMap[i][j] == -1)
-            {
-                SDLCommonFunction::showImage(imageNumber[9][(i + j) % 2], x, y, h, w);
-            }
-        }
-    }
-}
 void startGame()
 {
     mapInitialization(map);
-    showMapInitialization( );
+    showMapInitialization();
     mapInitialization(tickMap);
     randomBombMap();
     numberInMap();
@@ -123,42 +87,66 @@ bool page1(bool &checkHouse, bool &checkSound, bool &quit)
     checkHouse = false;
     bool pageHouse = true;
     SDL_Event e;
+    house.SetRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    house.Show();
     while (true)
     {
         while (SDL_PollEvent(&e) != 0)
         {
-            // User requests quit
             if (e.type == SDL_QUIT)
             {
                 quit = true;
             }
             else
             {
+                if (e.type == SDL_MOUSEMOTION)
+                {
+                    int x, y;
+                    SDL_GetMouseState(&x, &y);
+                    if (x >= 300 && x <= 700 && y >= 250 && y <= 350)// Bắt đầu chơi
+                    {
+
+                        batdauchoi.SetRect(300, 250, 400, 100);
+                        batdauchoi.Show();
+                    }
+                    else if (x >= 300 && x <= 700 && y >= 400 && y <= 500)// hướng dẫn
+                    {
+                        huongdanx.SetRect(300, 400, 400, 100);
+                        huongdanx.Show();
+                    }
+                    else
+                    {
+                        house.SetRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+                        house.Show();
+                    }
+                }
                 if (e.type == SDL_MOUSEBUTTONDOWN)
                 {
-                    if (checkSound)
-                        Mix_PlayChannel(-1, gSoundClick[0], 0);
                     int x, y;
                     SDL_GetMouseState(&x, &y);
                     if (pageHouse)
                     {
-                        if (x >= 800 && x <= 875 && y >= 50 && y <= 125)
+                        if (x >= 800 && x <= 875 && y >= 50 && y <= 125)// tắt bật âm thanh
                         {
+                            SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                             checkSound = !checkSound;
                         }
-                        if (x >= 300 && x <= 700 && y >= 250 && y <= 350)
+                        if (x >= 300 && x <= 700 && y >= 250 && y <= 350)//  bắt đầu chơi
                         {
+                            SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                             return true;
                         }
-                        else if (x >= 300 && x <= 700 && y >= 400 && y <= 500)
+                        else if (x >= 300 && x <= 700 && y >= 400 && y <= 500)// hướng dẫn
                         {
+                            SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                             pageHouse = false;
                         }
                     }
                     else
                     {
-                        if (x >= 850 && x <= 925 && y >= 25 && y <= 100)
+                        if (x >= 850 && x <= 925 && y >= 25 && y <= 100) // trở về
                         {
+                            SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                             pageHouse = true;
                         }
                     }
@@ -166,15 +154,16 @@ bool page1(bool &checkHouse, bool &checkSound, bool &quit)
             }
             if (pageHouse)
             {
-                SDLCommonFunction::showImage(house, 0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
                 if (!checkSound)
                 {
-                    SDLCommonFunction::showImage(soundOff, 800, 50, 75, 75);
+                    soundOff.SetRect(800, 50, 75, 75);
+                    soundOff.Show();
                 }
             }
             else
             {
-                SDLCommonFunction::showImage(huongDan, 0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
+                huongDan.SetRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+                huongDan.Show();
             }
             SDL_UpdateWindowSurface(gWindow);
         }
@@ -184,58 +173,84 @@ bool page1(bool &checkHouse, bool &checkSound, bool &quit)
 }
 bool page2(int &difficulry, bool &checkHouse, const bool &checkSound, bool &quit)
 {
+    gameDifficulry.SetRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    gameDifficulry.Show();
     SDL_Event e;
-    while (true)
+    while (SDL_PollEvent(&e) != 0)
     {
-        while (SDL_PollEvent(&e) != 0)
+        if (e.type == SDL_QUIT)
         {
-            // User requests quit
-            if (e.type == SDL_QUIT)
+            quit = true;
+        }
+        else
+        {
+            if (e.type == SDL_MOUSEMOTION)
             {
-                quit = true;
-            }
-            else
-            {
-                if (e.type == SDL_MOUSEBUTTONDOWN)
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (x >= 400 && x <= 600 && y >= 275 && y <= 325)// độ khó: dễ
                 {
-                    if (checkSound)
-                    {
-                        Mix_PlayChannel(-1, gSoundClick[0], 0);
-                    }
-                    int x, y;
-                    SDL_GetMouseState(&x, &y);
-                    if (x >= 400 && x <= 600 && y >= 275 && y <= 325)
-                    {
-                        difficulry = 0;
-                        return true;
-                    }
-                    if (x >= 400 && x <= 600 && y >= 350 && y <= 400)
-                    {
-                        difficulry = 1;
-                        return true;
-                    }
-                    if (x >= 400 && x <= 600 && y >= 425 && y <= 475)
-                    {
-                        difficulry = 2;
-                        return true;
-                    }
-                    if (x >= 400 && x <= 600 && y >= 500 && y <= 550)
-                    {
-                        difficulry = 3;
-                        return true;
-                    }
-                    if (x >= 850 && x <= 925 && y >= 25 && y <= 100)
-                    {
-                        checkHouse = true;
-                        return true;
-                    }
+                    de.SetRect(400, 275, 200, 50);
+                    de.Show();
+                }
+                else if (x >= 400 && x <= 600 && y >= 350 && y <= 400)// độ khó: trung bình
+                {
+                    trungbinh.SetRect(400, 350, 200, 50);
+                    trungbinh.Show();
+                }
+                else if (x >= 400 && x <= 600 && y >= 425 && y <= 475) // độ khó: khó
+                {
+                    kho.SetRect(400, 425, 200, 50);
+                    kho.Show();
+                }
+                else if (x >= 400 && x <= 600 && y >= 500 && y <= 550)// độ khó: rất khó
+                {
+                    ratkho.SetRect(400, 500, 200, 50);
+                    ratkho.Show();
+                }
+                else
+                {
+                    gameDifficulry.SetRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+                    gameDifficulry.Show();
                 }
             }
-            SDLCommonFunction::showImage(gameDifficulry, 0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
-            SDL_UpdateWindowSurface(gWindow);
+            if (e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (x >= 400 && x <= 600 && y >= 275 && y <= 325)// độ khó: dễ
+                {
+                    SDLCommonFunction::showSound(gSoundClick[0], checkSound);
+                    difficulry = 0;
+                    return true;
+                }
+                if (x >= 400 && x <= 600 && y >= 350 && y <= 400) // độ khó: trung bình
+                {
+                    SDLCommonFunction::showSound(gSoundClick[0], checkSound);
+                    difficulry = 1;
+                    return true;
+                }
+                if (x >= 400 && x <= 600 && y >= 425 && y <= 475)// độ khó: khó
+                {
+                    SDLCommonFunction::showSound(gSoundClick[0], checkSound);
+                    difficulry = 2;
+                    return true;
+                }
+                if (x >= 400 && x <= 600 && y >= 500 && y <= 550) // độ khó: rất khó
+                {
+                    SDLCommonFunction::showSound(gSoundClick[0], checkSound);
+                    difficulry = 3;
+                    return true;
+                }
+                if (x >= 850 && x <= 925 && y >= 25 && y <= 100) // trở về
+                {
+                    SDLCommonFunction::showSound(gSoundClick[0], checkSound);
+                    checkHouse = true;
+                    return true;
+                }
+            }
         }
-        if (quit)
-            break;
+        SDL_UpdateWindowSurface(gWindow);
     }
 }
 bool page3(bool &quit, const bool &checkSound)
@@ -257,7 +272,6 @@ bool page3(bool &quit, const bool &checkSound)
             }
             else
             {
-                // timeGame=SDL_GetTicks()/1000;
                 if (e.type == SDL_MOUSEBUTTONDOWN)
                 {
                     if (e.button.button == SDL_BUTTON_LEFT)
@@ -272,23 +286,20 @@ bool page3(bool &quit, const bool &checkSound)
                             {
                                 if (checkBomb(x, y))
                                 {
-                                    if (check)
-                                    {
-                                        youLose(x, y, checkSound);
-                                    }
+                                    youLose(x, y, checkSound);
                                     check = false;
                                 }
                                 else
                                 {
-                                    if (checkSound)
+                                    if (showMap[y][x] == -1)
                                     {
                                         if (map[y][x] > 0)
                                         {
-                                            Mix_PlayChannel(-1, gSoundClick[1], 0);
+                                            SDLCommonFunction::showSound(gSoundClick[1], checkSound);
                                         }
                                         else
                                         {
-                                            Mix_PlayChannel(-1, gSoundClick[2], 0);
+                                            SDLCommonFunction::showSound(gSoundClick[2], checkSound);
                                         }
                                     }
                                     editShowMap(x, y);
@@ -301,20 +312,14 @@ bool page3(bool &quit, const bool &checkSound)
                                 }
                             }
                         }
-                        if (x >= 850 && x <= 925 && y >= 25 && y <= 100)
+                        if (x >= 850 && x <= 925 && y >= 25 && y <= 100) // trở về
                         {
-                            if (checkSound)
-                            {
-                                Mix_PlayChannel(-1, gSoundClick[0], 0);
-                            }
+                            SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                             return true;
                         }
-                        if (x >= 750 && x <= 825 && y >= 25 && y <= 100)
+                        if (x >= 750 && x <= 825 && y >= 25 && y <= 100) // chơi lại
                         {
-                            if (checkSound)
-                            {
-                                Mix_PlayChannel(-1, gSoundClick[0], 0);
-                            }
+                            SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                             return false;
                         }
                     }
@@ -330,7 +335,8 @@ bool page3(bool &quit, const bool &checkSound)
         if (check)
             Time = SDL_GetTicks() / 1000;
         timeGame = Time - timeGameStart;
-        SDLCommonFunction::showImage(trong, 430, 50, 50, 50);
+        trong.SetRect(430, 50, 50, 50);
+        trong.Show();
         SDLCommonFunction::showText(timeGame, 435, 55);
         SDL_UpdateWindowSurface(gWindow);
         if (quit)
@@ -347,10 +353,7 @@ void buttonRight(const bool &checkSound)
         y = (y - gameSpecifications.yStart) / gameSpecifications.sizeSquare;
         if (showMap[y][x] == -1)
         {
-            if (checkSound)
-            {
-                Mix_PlayChannel(-1, gSoundClick[0], 0);
-            }
+            SDLCommonFunction::showSound(gSoundClick[0], checkSound);
             switch (tickMap[y][x])
             {
             case 0:
@@ -375,100 +378,19 @@ void buttonRight(const bool &checkSound)
 }
 void youLose(const int &x, const int &y, const bool &checkSound)
 {
-    SDL_Rect stretch;
-    stretch.x = gameSpecifications.xStart + gameSpecifications.sizeSquare * x;
-    stretch.y = gameSpecifications.yStart + gameSpecifications.sizeSquare * y;
-    stretch.w = gameSpecifications.sizeSquare;
-    stretch.h = gameSpecifications.sizeSquare;
-    SDL_BlitScaled(imageNumber[10][(x + y) % 2], NULL, gScreenSurface, &stretch);
-    if (checkSound)
-    {
-        Mix_PlayChannel(-1, gSoundBomb, 0);
-    }
-    SDL_UpdateWindowSurface(gWindow);
-    SDL_Delay(500);
-    for (int i = 0; i < gameSpecifications.mapHeight; i++)
-    {
-        for (int j = 0; j < gameSpecifications.mapWidth; j++)
-        {
-            if (map[i][j] == -1 && (i != y || j != x))
-            {
-                stretch.x = gameSpecifications.xStart + gameSpecifications.sizeSquare * j;
-                stretch.y = gameSpecifications.yStart + gameSpecifications.sizeSquare * i;
-                stretch.w = gameSpecifications.sizeSquare;
-                stretch.h = gameSpecifications.sizeSquare;
-                SDL_BlitScaled(imageNumber[10][(i + j) % 2], NULL, gScreenSurface, &stretch);
-                SDL_UpdateWindowSurface(gWindow);
-                if (checkSound)
-                {
-                    Mix_PlayChannel(-1, gSoundBomb, 0);
-                }
-                SDL_Delay(500);
-            }
-        }
-    }
-    stretch.x = gameSpecifications.xStart;
-    stretch.y = 300;
-    stretch.h = 100;
-    stretch.w = gameSpecifications.sizeSquare * gameSpecifications.mapWidth;
-    SDL_BlitScaled(lose, NULL, gScreenSurface, &stretch);
-    if (checkSound)
-    {
-        Mix_PlayChannel(-1, gSoundLose, 0);
-    }
+    showBomb(x, y, checkSound);
+    lose.SetRect(gameSpecifications.xStart, 300, gameSpecifications.sizeSquare * gameSpecifications.mapWidth, 100);
+    lose.Show();
+    SDLCommonFunction::showSound(gSoundLose, checkSound);
 }
 void youWin(const bool &checkSound)
 {
-    if (checkSound)
-    {
-        Mix_PlayChannel(-1, gSoundWin, 0);
-    }
-    SDL_Rect stretch;
-    stretch.x = gameSpecifications.xStart;
-    stretch.y = 300;
-    stretch.h = 100;
-    stretch.w = gameSpecifications.sizeSquare * gameSpecifications.mapWidth;
-    SDL_BlitScaled(win, NULL, gScreenSurface, &stretch);
+    SDLCommonFunction::showSound(gSoundWin, checkSound);
+    win.SetRect(gameSpecifications.xStart, 300, gameSpecifications.sizeSquare * gameSpecifications.mapWidth, 100);
+    win.Show();
     if (timeMin[difficulry] > timeGame)
     {
         timeMin[difficulry] = timeGame;
     }
     writeTimeGameMin();
 }
-void readTimeGameMin()
-{
-    string path;
-    ifstream file;
-    file.open("time_game_min.txt");
-    if (!file)
-    {
-        cout << "Failed to open file." << endl;
-    }
-    else
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            file >> timeMin[i];
-        }
-    }
-    file.close();
-}
-void writeTimeGameMin()
-{
-    string path;
-    ofstream file;
-    file.open("time_game_min.txt", ios::out | ios::trunc);
-    if (!file)
-    {
-        cout << "Failed to open file." << endl;
-    }
-    else
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            file << timeMin[i] << endl;
-        }
-    }
-    file.close();
-}
-

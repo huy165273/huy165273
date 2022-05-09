@@ -9,7 +9,7 @@ int **tickMap = new int *[SIZE_HEIGHT_MAX];
 
 specifications arraySpecifications[4] = {{275, 125, 10, 10, 45, 10},
                                          {100, 150, 10, 20, 40, 30},
-                                         {200, 125, 15, 20, 30, 60},
+                                         {200, 125, 15, 20, 30, 50},
                                          {50, 125, 15, 30, 30, 99}};
 
 void mapInitialization(int **map)
@@ -99,7 +99,11 @@ bool checkBomb(int x, int y)
 }
 void editShowMap(int x, int y)
 {
-    SDLCommonFunction::showImage(imageNumber[map[y][x] + 1][(x + y) % 2], gameSpecifications.xStart + gameSpecifications.sizeSquare * x, gameSpecifications.yStart + gameSpecifications.sizeSquare * y, gameSpecifications.sizeSquare, gameSpecifications.sizeSquare);
+    int X = gameSpecifications.xStart + gameSpecifications.sizeSquare * x;
+    int Y = gameSpecifications.yStart + gameSpecifications.sizeSquare * y;
+    int w = gameSpecifications.sizeSquare;
+    imageNumber[map[y][x] + 1][(x + y) % 2].SetRect(X, Y, w, w);
+    imageNumber[map[y][x] + 1][(x + y) % 2].Show();
     SDL_UpdateWindowSurface(gWindow);
     SDL_Delay(25);
     if (map[y][x] > 0)
@@ -116,11 +120,15 @@ void editShowMap(int x, int y)
             }
     }
 }
-void DeleteMap(int **map, int SIZE_HEIGHT_MAX)
+void DeleteMap()
 {
     for (int i = 0; i < SIZE_HEIGHT_MAX; i++)
     {
         delete[] map[i];
+        delete[] showMap[i];
+        delete[] tickMap[i];
     }
     delete[] * map;
+    delete[] * showMap;
+    delete[] * tickMap;
 }
