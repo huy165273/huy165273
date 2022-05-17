@@ -29,6 +29,7 @@ namespace SDLCommonFunction
     SDL_Surface *loadImage(string path);
     void showImage(SDL_Surface *image, const int &x, const int &y, const int &h, const int &w);
     void showText(int time, const int&x, const int &y);
+    bool loadSound();
     void showSound(Mix_Chunk *gSoundl, const bool &checkSound);
 }
 

@@ -1,22 +1,5 @@
 #include "Image.h"
 
-Image(imageNumber[11][2]);
-Image domin;
-Image house;
-Image win;
-Image lose;
-Image huongDan;
-Image gameDifficulry;
-Image trong;
-Image soundOff;
-Image batdauchoi;
-Image huongdanx;
-Image de;
-Image trungbinh;
-Image kho;
-Image ratkho;
-
-
 Image::Image()
 {
     rect.x = 0;

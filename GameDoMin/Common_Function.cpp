@@ -54,8 +54,8 @@ bool SDLCommonFunction::init()
     gSoundClick[2] = Mix_LoadWAV("sound/mixkit-retro.wav");
     gSoundBomb = Mix_LoadWAV("sound/Bomb.wav");
     gSoundWin = Mix_LoadWAV("sound/sound-win.wav");
-    gSoundLose= Mix_LoadWAV("sound/sound-lose.wav");
-    if ( gSoundBomb == NULL || gSoundWin == NULL || gSoundLose==NULL)
+    gSoundLose = Mix_LoadWAV("sound/sound-lose.wav");
+    if (gSoundBomb == NULL || gSoundWin == NULL || gSoundLose == NULL)
     {
         success = false;
     }
@@ -65,6 +65,10 @@ void SDLCommonFunction::close()
 {
     Mix_FreeChunk(gSoundBomb);
     gSoundBomb = NULL;
+    Mix_FreeChunk(gSoundWin);
+    gSoundWin = NULL;
+    Mix_FreeChunk(gSoundLose);
+    gSoundLose = NULL;
     for (int i = 0; i < 3; i++)
     {
         Mix_FreeChunk(gSoundClick[i]);
@@ -111,7 +115,20 @@ void SDLCommonFunction::showText(int timeGame, const int &x, const int &y)
     fontText = TTF_RenderText_Solid(gFontText, strTime.c_str(), {255, 0, 0});
     SDL_BlitSurface(fontText, NULL, gScreenSurface, &stretch);
 }
-void SDLCommonFunction::showSound(Mix_Chunk *gSoundl, const bool &checkSound){
+bool SDLCommonFunction::loadSound(){
+    gSoundClick[0] = Mix_LoadWAV("sound/mouse-click.wav");
+    gSoundClick[1] = Mix_LoadWAV("sound/mixkit-arcade.wav");
+    gSoundClick[2] = Mix_LoadWAV("sound/mixkit-retro.wav");
+    gSoundBomb = Mix_LoadWAV("sound/Bomb.wav");
+    gSoundWin = Mix_LoadWAV("sound/sound-win.wav");
+    gSoundLose = Mix_LoadWAV("sound/sound-lose.wav");
+    if(gSoundClick[0]==NULL || gSoundClick[1]==NULL || gSoundClick[2]==NULL || gSoundBomb==NULL ||gSoundWin==NULL || gSoundLose==NULL){
+        return false;
+    }
+    return true;
+} 
+void SDLCommonFunction::showSound(Mix_Chunk *gSoundl, const bool &checkSound)
+{
     if (checkSound)
     {
         Mix_PlayChannel(-1, gSoundl, 0);

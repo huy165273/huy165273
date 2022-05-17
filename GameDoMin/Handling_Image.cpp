@@ -1,5 +1,21 @@
 #include "Handling_Image.h"
 
+Image(imageNumber[11][2]);
+Image minesweeper;
+Image house;
+Image win;
+Image lose;
+Image tutorialContent; // nội dung hướng dẫn
+Image gameDifficulry;
+Image blank; // ảnh trống k có gì
+Image soundOff;
+Image startGame; // bắt đầu chơi
+Image tutorial;  // Hướng dẫn
+Image easy;
+Image medium;
+Image hard;
+Image veryHard;
+
 bool loadMedia()
 {
     bool success = true;
@@ -35,7 +51,7 @@ bool loadMedia()
             success = false;
         }
         file >> path;
-        if (!domin.loadImage(path))
+        if (!minesweeper.loadImage(path))
         {
             success = false;
         }
@@ -45,7 +61,7 @@ bool loadMedia()
             success = false;
         }
         file >> path;
-        if (!huongDan.loadImage(path))
+        if (!tutorialContent.loadImage(path))
         {
             success = false;
         }
@@ -55,7 +71,7 @@ bool loadMedia()
             success = false;
         }
         file >> path;
-        if (!trong.loadImage(path))
+        if (!blank.loadImage(path))
         {
             success = false;
         }
@@ -65,32 +81,32 @@ bool loadMedia()
             success = false;
         }
         file >> path;
-        if (!batdauchoi.loadImage(path))
+        if (!startGame.loadImage(path))
         {
             success = false;
         }
         file >> path;
-        if (!huongdanx.loadImage(path))
+        if (!tutorial.loadImage(path))
         {
             success = false;
         }
         file >> path;
-        if (!de.loadImage(path))
+        if (!easy.loadImage(path))
         {
             success = false;
         }
         file >> path;
-        if (!trungbinh.loadImage(path))
+        if (!medium.loadImage(path))
         {
             success = false;
         }
         file >> path;
-        if (!kho.loadImage(path))
+        if (!hard.loadImage(path))
         {
             success = false;
         }
         file >> path;
-        if (!ratkho.loadImage(path))
+        if (!veryHard.loadImage(path))
         {
             success = false;
         }
@@ -101,10 +117,10 @@ bool loadMedia()
 
 void showTotalImage()
 {
-    domin.SetRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    domin.Show();
-    SDLCommonFunction::showText(flagNumber, 685, 55);
-    SDLCommonFunction::showText(timeGame, 435, 55);
+    minesweeper.SetRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    minesweeper.Show();
+    SDLCommonFunction::showText(flagNumber, 740, 55);
+    SDLCommonFunction::showText(timeGame, 470, 55);
     showTimeGameMin(difficulry);
     for (int i = 0; i < gameSpecifications.mapHeight; i++)
     {
@@ -171,19 +187,19 @@ void showBomb(const int &x, const int &y, const bool &checkSound)
 void closeImage()
 {
     house.~Image();
-    domin.~Image();
-    huongDan.~Image();
-    gameDifficulry.~Image();
+    minesweeper.~Image();
+    tutorialContent.~Image();// nội dung hướng dẫn
+    gameDifficulry.~Image();// độ khó
     win.~Image();
     lose.~Image();
-    trong.~Image();
+    blank.~Image();
     soundOff.~Image();
-    batdauchoi.~Image();
-    huongdanx.~Image();
-    de.~Image();
-    trungbinh.~Image();
-    kho.~Image();
-    ratkho.~Image();
+    startGame.~Image();
+    tutorial.~Image();
+    easy.~Image();
+    medium.~Image();
+    hard.~Image();
+    veryHard.~Image();
     for (int i = 0; i < 11; i++)
     {
         for (int j = 0; j < 2; j++)

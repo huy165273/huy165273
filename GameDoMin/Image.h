@@ -19,19 +19,4 @@ private:
     SDL_Rect rect;
 };
 
-extern Image(imageNumber[11][2]);
-extern Image domin;
-extern Image house;
-extern Image win;
-extern Image lose;
-extern Image huongDan;
-extern Image gameDifficulry;
-extern Image trong;
-extern Image soundOff;
-extern Image batdauchoi;
-extern Image huongdanx;
-extern Image de;
-extern Image trungbinh;
-extern Image kho;
-extern Image ratkho;
 #endif

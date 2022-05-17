@@ -41,6 +41,6 @@ void writeTimeGameMin()
 void showTimeGameMin(const int &difficulry){
     if (timeMin[difficulry] != 9999)
     {
-        SDLCommonFunction::showText(timeMin[difficulry], 565, 55);
+        SDLCommonFunction::showText(timeMin[difficulry], 605, 55);
     }
 }

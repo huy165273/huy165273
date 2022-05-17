@@ -27,3 +27,10 @@ image_bmp/house.bmp
 image_bmp/huongDan.bmp
 image_bmp/playGame.bmp
 image_bmp/trong.bmp
+image_bmp/sound_off.bmp
+image_bmp/batdauchoi.bmp
+image_bmp/huongdanx.bmp
+image_bmp/de.bmp
+image_bmp/trungbinh.bmp
+image_bmp/kho.bmp
+image_bmp/ratkho.bmp
