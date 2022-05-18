@@ -28,6 +28,6 @@ extern Image veryHard;
 
 bool loadMedia();
 void showTotalImage();
-void showBomb(const int &x, const int &y, const bool &checkSound);
+void showBomb(const int &x, const int &y, const bool &checkSound, bool &checkHouse, bool &playAgain);
 void closeImage();
 #endif

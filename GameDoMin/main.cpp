@@ -5,9 +5,9 @@ using namespace std;
 void gameInit();
 bool page1(bool &checkHouse, bool &checkSound, bool &quit);
 bool page2(int &diffculry, bool &checkHouse, const bool &checkSound, bool &quit);
-bool page3(bool &quit, const bool &checkSound);
+void page3(bool &quit, const bool &checkSound, bool &checkHouse, bool &playAgain);
 void buttonRight(const bool &checkSound);
-void youLose(const int &x, const int &y, const bool &checkSound);
+void youLose(const int &x, const int &y, const bool &checkSound, bool &checkHouse, bool &playAgain);
 void youWin(const bool &checkSound);
 
 int timeGame;
@@ -24,7 +24,7 @@ int main(int arc, char *argv[])
     }
     else
     {
-        if (!loadMedia()&& !SDLCommonFunction::loadSound())
+        if (!loadMedia() && !SDLCommonFunction::loadSound())
         {
             cout << "Failed to load media." << endl;
         }
@@ -55,14 +55,7 @@ int main(int arc, char *argv[])
                     {
                         gameInit();
                         playAgain = false;
-                        if (page3(quit, checkSound))
-                        {
-                            checkHouse = true;
-                        }
-                        else
-                        {
-                            playAgain = true;
-                        }
+                        page3(quit, checkSound, checkHouse, playAgain);
                     } while (playAgain);
                 }
             }
@@ -103,13 +96,13 @@ bool page1(bool &checkHouse, bool &checkSound, bool &quit)
                 {
                     int x, y;
                     SDL_GetMouseState(&x, &y);
-                    if (x >= 300 && x <= 700 && y >= 250 && y <= 350)// Bắt đầu chơi
+                    if (x >= 300 && x <= 700 && y >= 250 && y <= 350) // Bắt đầu chơi
                     {
 
                         startGame.SetRect(300, 250, 400, 100);
                         startGame.Show();
                     }
-                    else if (x >= 300 && x <= 700 && y >= 400 && y <= 500)// hướng dẫn
+                    else if (x >= 300 && x <= 700 && y >= 400 && y <= 500) // hướng dẫn
                     {
                         tutorial.SetRect(300, 400, 400, 100);
                         tutorial.Show();
@@ -126,17 +119,17 @@ bool page1(bool &checkHouse, bool &checkSound, bool &quit)
                     SDL_GetMouseState(&x, &y);
                     if (pageHouse)
                     {
-                        if (x >= 760 && x <= 860 && y >= 30 && y <= 120)// tắt bật âm thanh
+                        if (x >= 760 && x <= 860 && y >= 30 && y <= 120) // tắt bật âm thanh
                         {
                             SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                             checkSound = !checkSound;
                         }
-                        if (x >= 300 && x <= 700 && y >= 250 && y <= 350)//  bắt đầu chơi
+                        if (x >= 300 && x <= 700 && y >= 250 && y <= 350) //  bắt đầu chơi
                         {
                             SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                             return true;
                         }
-                        else if (x >= 300 && x <= 700 && y >= 400 && y <= 500)// hướng dẫn
+                        else if (x >= 300 && x <= 700 && y >= 400 && y <= 500) // hướng dẫn
                         {
                             SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                             pageHouse = false;
@@ -188,12 +181,12 @@ bool page2(int &difficulry, bool &checkHouse, const bool &checkSound, bool &quit
             {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                if (x >= 400 && x <= 600 && y >= 275 && y <= 325)// độ khó: dễ
+                if (x >= 400 && x <= 600 && y >= 275 && y <= 325) // độ khó: dễ
                 {
                     easy.SetRect(400, 275, 200, 50);
                     easy.Show();
                 }
-                else if (x >= 400 && x <= 600 && y >= 350 && y <= 400)// độ khó: trung bình
+                else if (x >= 400 && x <= 600 && y >= 350 && y <= 400) // độ khó: trung bình
                 {
                     medium.SetRect(400, 350, 200, 50);
                     medium.Show();
@@ -203,7 +196,7 @@ bool page2(int &difficulry, bool &checkHouse, const bool &checkSound, bool &quit
                     hard.SetRect(400, 425, 200, 50);
                     hard.Show();
                 }
-                else if (x >= 400 && x <= 600 && y >= 500 && y <= 550)// độ khó: rất khó
+                else if (x >= 400 && x <= 600 && y >= 500 && y <= 550) // độ khó: rất khó
                 {
                     veryHard.SetRect(400, 500, 200, 50);
                     veryHard.Show();
@@ -218,7 +211,7 @@ bool page2(int &difficulry, bool &checkHouse, const bool &checkSound, bool &quit
             {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                if (x >= 400 && x <= 600 && y >= 275 && y <= 325)// độ khó: dễ
+                if (x >= 400 && x <= 600 && y >= 275 && y <= 325) // độ khó: dễ
                 {
                     SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                     difficulry = 0;
@@ -230,7 +223,7 @@ bool page2(int &difficulry, bool &checkHouse, const bool &checkSound, bool &quit
                     difficulry = 1;
                     return true;
                 }
-                if (x >= 400 && x <= 600 && y >= 425 && y <= 475)// độ khó: khó
+                if (x >= 400 && x <= 600 && y >= 425 && y <= 475) // độ khó: khó
                 {
                     SDLCommonFunction::showSound(gSoundClick[0], checkSound);
                     difficulry = 2;
@@ -253,7 +246,7 @@ bool page2(int &difficulry, bool &checkHouse, const bool &checkSound, bool &quit
         SDL_UpdateWindowSurface(gWindow);
     }
 }
-bool page3(bool &quit, const bool &checkSound)
+void page3(bool &quit, const bool &checkSound, bool &checkHouse, bool &playAgain)
 {
     readTimeGameMin();
     Time = SDL_GetTicks() / 1000;
@@ -286,7 +279,10 @@ bool page3(bool &quit, const bool &checkSound)
                             {
                                 if (checkBomb(x, y))
                                 {
-                                    youLose(x, y, checkSound);
+                                    youLose(x, y, checkSound, checkHouse, playAgain);
+                                    if(checkHouse || playAgain){
+                                        return;
+                                    }
                                     check = false;
                                 }
                                 else
@@ -315,12 +311,14 @@ bool page3(bool &quit, const bool &checkSound)
                         if (x >= 890 && x <= 965 && y >= 35 && y <= 110) // trở về
                         {
                             SDLCommonFunction::showSound(gSoundClick[0], checkSound);
-                            return true;
+                            checkHouse = true;
+                            return;
                         }
                         if (x >= 795 && x <= 870 && y >= 35 && y <= 110) // chơi lại
                         {
                             SDLCommonFunction::showSound(gSoundClick[0], checkSound);
-                            return false;
+                            playAgain = true;
+                            return;
                         }
                     }
                     if (e.button.button == SDL_BUTTON_RIGHT)
@@ -377,11 +375,14 @@ void buttonRight(const bool &checkSound)
         }
     }
 }
-void youLose(const int &x, const int &y, const bool &checkSound)
+void youLose(const int &x, const int &y, const bool &checkSound, bool &checkHouse, bool &playAgain)
 {
-    showBomb(x, y, checkSound);
-    lose.SetRect(gameSpecifications.xStart, 300, gameSpecifications.sizeSquare * gameSpecifications.mapWidth, 100);
-    lose.Show();
+    showBomb(x, y, checkSound, checkHouse, playAgain);
+    if (!checkHouse && !playAgain)
+    {
+        lose.SetRect(gameSpecifications.xStart, 300, gameSpecifications.sizeSquare * gameSpecifications.mapWidth, 100);
+        lose.Show();
+    }
     SDLCommonFunction::showSound(gSoundLose, checkSound);
 }
 void youWin(const bool &checkSound)

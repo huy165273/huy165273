@@ -148,7 +148,7 @@ void showTotalImage()
         }
     }
 }
-void showBomb(const int &x, const int &y, const bool &checkSound)
+void showBomb(const int &x, const int &y, const bool &checkSound, bool &checkHouse, bool &playAgain)
 {
     int X = gameSpecifications.xStart + gameSpecifications.sizeSquare * x;
     int Y = gameSpecifications.yStart + gameSpecifications.sizeSquare * y;
@@ -156,12 +156,10 @@ void showBomb(const int &x, const int &y, const bool &checkSound)
     int h = gameSpecifications.sizeSquare;
     imageNumber[10][(x + y) % 2].SetRect(X, Y, w, h);
     imageNumber[10][(x + y) % 2].Show();
-    if (checkSound)
-    {
-        Mix_PlayChannel(-1, gSoundBomb, 0);
-    }
+    SDLCommonFunction::showSound(gSoundBomb, checkSound);
     SDL_UpdateWindowSurface(gWindow);
     SDL_Delay(400);
+    SDL_Event e;
     for (int i = 0; i < gameSpecifications.mapHeight; i++)
     {
         for (int j = 0; j < gameSpecifications.mapWidth; j++)
@@ -181,6 +179,27 @@ void showBomb(const int &x, const int &y, const bool &checkSound)
                 }
                 SDL_Delay(400);
             }
+
+            while (SDL_PollEvent(&e) != 0)
+            {
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    int x, y;
+                    SDL_GetMouseState(&x, &y);
+                    if (x >= 890 && x <= 965 && y >= 35 && y <= 110) // trở về
+                    {
+                        SDLCommonFunction::showSound(gSoundClick[0], checkSound);
+                        checkHouse = true;
+                        return;
+                    }
+                    if (x >= 795 && x <= 870 && y >= 35 && y <= 110) // chơi lại
+                    {
+                        SDLCommonFunction::showSound(gSoundClick[0], checkSound);
+                        playAgain = true;
+                        return;
+                    }
+                }
+            }
         }
     }
 }
@@ -188,8 +207,8 @@ void closeImage()
 {
     house.~Image();
     minesweeper.~Image();
-    tutorialContent.~Image();// nội dung hướng dẫn
-    gameDifficulry.~Image();// độ khó
+    tutorialContent.~Image(); // nội dung hướng dẫn
+    gameDifficulry.~Image();  // độ khó
     win.~Image();
     lose.~Image();
     blank.~Image();
