@@ -1,12 +1,11 @@
-Nguyễn Ngọc Huy - 21020765
+#Dự án cuối kì lớp học phần INT2215 1 - Lập trình nâng cao
 
-Dự án cuối kì lớp học phần INT2215 1 - Lập trình nâng cao
+#Nguyễn Ngọc Huy - 21020765
 
-MSSV: 21020765
-1.Hướng dẫn cài đặt:
+#1. Hướng dẫn cài đặt:
 
-2.Mô tả chung về trò chơi, các ý tưởng chính
-a) Mô tả chung về trò chơi:
+#2.Mô tả chung về trò chơi, các ý tưởng chính
+##a) Mô tả chung về trò chơi:
 -Tên trò chơi: Dò Mìn
 
 -Cách chơi: 
@@ -15,18 +14,18 @@ a) Mô tả chung về trò chơi:
 +Nếu không chắc chắn một ô có mìn, người chơi đánh dấu vào ô đó bằng hình dấu hỏi chấm (click chuột phải 2 lần).
 +Khi 8 ô lân cận trong một số đã có đủ số mìn mà vẫn còn các ô khác thì những ô đó không có mìn
 +Trò chơi kết thúc với phần thắng dành cho người chơi nếu mở được tất cả các ô không có mìn.
-b) Các chức năng được cài đặt trong trò chơi:
+##b) Các chức năng được cài đặt trong trò chơi:
 -Hiệu ứng âm thanh khi: click chuột, trúng mìn, đặt cờ, chiến thắng , thua cuộc, ...
 -Chức năng tắt(mở) âm thanh
 -Chọn mức độ khó khi bắt đầu trò chơi (4 mức độ)
 -Các chức năng chơi lại, trở về menu, hướng dẫn cách chơi, menu, tương tác với người chơi qua chuột
 -Hiển thị thời gian người chơi đang chơi, hiển thị thời gian nhanh nhất người chơi chiến thắng 1 màn chơi
-4.Các kỹ thuật lập trình được sử dụng trong chương trình
+#4.Các kỹ thuật lập trình được sử dụng trong chương trình
 -Kĩ thuật lập trình đồ họa, âm thanh bằng SDL 
 -Kĩ thuật lập trình hướng đối tượng
 -Kĩ thuật tách file 
 -Các kĩ thuật  khác được: Mảng, con trỏ, cấu trúc, lớp, cách tạo số ngẫu nhiên(vị trí ngẫu nhiên), vòng lặp các trạng thái của game, ....
-5.Kết luận, hướng phát triển và các điều tâm đắc rút ra được sau khi hoàn thiện chương trình
+#5.Kết luận, hướng phát triển và các điều tâm đắc rút ra được sau khi hoàn thiện chương trình
 *Hướng phát triển:
 -Làm cho ô đầu tiên người chơi chọn luôn là ô trống (xung quang không có quả mìn nào) để tránh trường hợp người chơi thua luôn ở lần chọn ô đầu tiên.
 -Phát triển thêm các tính năng:
