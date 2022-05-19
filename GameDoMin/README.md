@@ -14,6 +14,11 @@
    + Nếu không chắc chắn một ô có mìn, người chơi đánh dấu vào ô đó bằng hình dấu hỏi chấm (click chuột phải 2 lần).
    + Khi 8 ô lân cận trong một số đã có đủ số mìn mà vẫn còn các ô khác thì những ô đó không có mìn
    + Trò chơi kết thúc với phần thắng dành cho người chơi nếu mở được tất cả các ô không có mìn.
+#### b) Các ý tưởng chính
+ - Hệ thống bãi mìn của trò chơi dò mìn
+ - Hệ thống chọn độ khó
+ - Hệ thống âm thanh
+ - Hệ thống đồ họa bắt mắt
 ### 3. Các chức năng được cài đặt trong trò chơi:
 - Hiệu ứng âm thanh khi: click chuột, trúng mìn, đặt cờ, chiến thắng , thua cuộc, ...
 - Chức năng tắt(mở) âm thanh
