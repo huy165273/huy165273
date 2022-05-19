@@ -1,19 +1,19 @@
 # Dự án cuối kì lớp học phần INT2215 1 - Lập trình nâng cao
 
 ## Nguyễn Ngọc Huy - 21020765
-***
+
 ### 1. Hướng dẫn cài đặt:
 
 ### 2. Mô tả chung về trò chơi, các ý tưởng chính
 #### a) Mô tả chung về trò chơi:
--Tên trò chơi: Dò Mìn
+- Tên trò chơi: Dò Mìn
 
--Cách chơi:
- + Click chuột vào một ô vuông trong bảng. Nếu không may trúng phải ô có mìn (điều này thường xảy ra với người mới chơi) thì trò chơi kết thúc. Trường hợp khác là ô đó không có mìn và một vùng các ô sẽ được mở ra cùng với những con số. Số trên một ô là lượng mìn trong 8 ô nằm quanh với ô đó.
- + Nếu chắc chắn một ô có mìn, người chơi đánh dấu vào ô đó bằng hình lá cờ (click chuột phải).
- + Nếu không chắc chắn một ô có mìn, người chơi đánh dấu vào ô đó bằng hình dấu hỏi chấm (click chuột phải 2 lần).
- + Khi 8 ô lân cận trong một số đã có đủ số mìn mà vẫn còn các ô khác thì những ô đó không có mìn
- + Trò chơi kết thúc với phần thắng dành cho người chơi nếu mở được tất cả các ô không có mìn.
+- Cách chơi:
+   + Click chuột vào một ô vuông trong bảng. Nếu không may trúng phải ô có mìn (điều này thường xảy ra với người mới chơi) thì trò chơi kết thúc. Trường hợp khác là ô đó không có mìn và một vùng các ô sẽ được mở ra cùng với những con số. Số trên một ô là lượng mìn trong 8 ô nằm quanh với ô đó.
+   + Nếu chắc chắn một ô có mìn, người chơi đánh dấu vào ô đó bằng hình lá cờ (click chuột phải).
+   + Nếu không chắc chắn một ô có mìn, người chơi đánh dấu vào ô đó bằng hình dấu hỏi chấm (click chuột phải 2 lần).
+   + Khi 8 ô lân cận trong một số đã có đủ số mìn mà vẫn còn các ô khác thì những ô đó không có mìn
+   + Trò chơi kết thúc với phần thắng dành cho người chơi nếu mở được tất cả các ô không có mìn.
 ### 3. Các chức năng được cài đặt trong trò chơi:
 - Hiệu ứng âm thanh khi: click chuột, trúng mìn, đặt cờ, chiến thắng , thua cuộc, ...
 - Chức năng tắt(mở) âm thanh
@@ -25,7 +25,7 @@
 - Kĩ thuật lập trình đồ họa, âm thanh bằng SDL 
 - Kĩ thuật lập trình hướng đối tượng
 - Kĩ thuật tách file 
-- Các kĩ thuật  khác được: Mảng, con trỏ, cấu trúc, lớp, cách tạo số ngẫu nhiên(vị trí ngẫu nhiên), vòng lặp các trạng thái của game, ....
+- Các kĩ thuật  khác: Mảng, con trỏ, cấu trúc, lớp, cách tạo số ngẫu nhiên(vị trí ngẫu nhiên), vòng lặp các trạng thái của game, ....
 ### 5. Kết luận, hướng phát triển và các điều tâm đắc rút ra được sau khi hoàn thiện chương trình
 a) Hướng phát triển:
 - Làm cho ô đầu tiên người chơi chọn luôn là ô trống (xung quang không có quả mìn nào) để tránh trường hợp người chơi thua luôn ở lần chọn ô đầu tiên.

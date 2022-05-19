@@ -333,7 +333,7 @@ void page3(bool &quit, const bool &checkSound, bool &checkHouse, bool &playAgain
         if (check)
             Time = SDL_GetTicks() / 1000;
         timeGame = Time - timeGameStart;
-        blank.SetRect(468, 50, 50, 50);
+        blank.SetRect(468, 50, 60, 50);
         blank.Show();
         SDLCommonFunction::showText(timeGame, 473, 55);
         SDL_UpdateWindowSurface(gWindow);
