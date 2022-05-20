@@ -41,7 +41,7 @@
 - Chọn mức độ khó khi bắt đầu trò chơi (4 mức độ)
 - Các chức năng chơi lại, trở về menu, hướng dẫn cách chơi, menu, tương tác với người chơi qua chuột
 - Hiển thị thời gian người chơi đang chơi, hiển thị thời gian nhanh nhất người chơi chiến thắng 1 màn chơi
-- Video demo [tại đây](https://www.youtube.com/watch?v=8EkawSNiX6k&t=3s)
+- Video demo [tại đây](https://www.youtube.com/watch?v=8kiX4DT2XRo)
 ### 4. Các kỹ thuật lập trình được sử dụng trong chương trình
 - Kĩ thuật lập trình đồ họa, âm thanh bằng SDL 
 - Kĩ thuật lập trình hướng đối tượng
