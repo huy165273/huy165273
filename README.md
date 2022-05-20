@@ -16,6 +16,7 @@
 - Chạy chương trình:
     + Cách 1: Ấn đúp chuột vào file main.exe 
     + Cách 2:
+        + Truy cập vào Folder GameDoMin trên VS Code
         + Mở 1 Terminal mới.
         + Nhập lệnh mingw32-make rồi bấm enter.
         + Nhập lệnh .\main.exe rồi bấm enter
