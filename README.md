@@ -61,3 +61,9 @@ b) Điều tâm đắc:
   + Biết được tiến trình tạo ra một game và cách vận hành của một game
   + Biết sử dụng SDL 2.0 để tạo một chương trình đồ họa có đồ họa và âm thanh
   + Củng cố kiến thức sử dụng ngôn ngữ lập trình C++
+### 6. Nguồn tham khảo và tài nguyên game
++ Chương trình được xây dựng trên VS Code.
++ Các thư viện SDL.
++ Âm thanh sử dụng trong game được tải xuống từ [Mixkit](https://mixkit.co/free-sound-effects/win/).
++ [Lazy Foo](https://lazyfoo.net/tutorials/SDL/)
++ [Phát Triển Phần Mềm 123AZ](https://phattrienphanmem123az.com/)
