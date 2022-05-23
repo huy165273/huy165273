@@ -47,7 +47,7 @@
 - Kĩ thuật lập trình đồ họa, âm thanh bằng SDL 
 - Kĩ thuật lập trình hướng đối tượng
 - Kĩ thuật tách file 
-- Các kĩ thuật  khác: Mảng, con trỏ, cấu trúc, lớp, cách tạo số ngẫu nhiên(vị trí ngẫu nhiên), vòng lặp các trạng thái của game, ....
+- Các kĩ thuật  khác: Mảng, con trỏ, đệ quy, cấu trúc, lớp, cách tạo số ngẫu nhiên(vị trí ngẫu nhiên), vòng lặp các trạng thái của game, ....
 ### 5. Kết luận, hướng phát triển và các điều tâm đắc rút ra được sau khi hoàn thiện chương trình
 a) Hướng phát triển:
 - Làm cho ô đầu tiên người chơi chọn luôn là ô trống (xung quang không có quả mìn nào) để tránh trường hợp người chơi thua luôn ở lần chọn ô đầu tiên.
