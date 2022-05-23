@@ -18,13 +18,13 @@ specifications gameSpecifications;
 
 int main(int arc, char *argv[])
 {
-    if (!SDLCommonFunction::init())
+    if (!SDLCommonFunction::init())// Khởi động SDL và tạo cửa sổ
     {
         cout << "Failed to init." << endl;
     }
     else
     {
-        if (!loadMedia() && !SDLCommonFunction::loadSound())
+        if (!loadMedia() && !SDLCommonFunction::loadSound())// load ảnh và âm thanh
         {
             cout << "Failed to load media." << endl;
         }
@@ -40,7 +40,7 @@ int main(int arc, char *argv[])
                     checkPage1 = false;
                     checkPage2 = false;
                 }
-                if (!checkPage1 || checkHouse)
+                if (!checkPage1 )
                 {
                     checkPage1 = page1(checkHouse, checkSound, quit);
                 }

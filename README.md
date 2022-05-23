@@ -31,6 +31,7 @@
    + Khi 8 ô lân cận trong một số đã có đủ số mìn mà vẫn còn các ô khác thì những ô đó không có mìn
    + Trò chơi kết thúc với phần thắng dành cho người chơi nếu mở được tất cả các ô không có mìn.
 #### b) Các ý tưởng chính
+ - Dựa trên ý tưởng của trò chơi Minesweeper truyền thống
  - Hệ thống bãi mìn của trò chơi dò mìn
  - Hệ thống chọn độ khó
  - Hệ thống âm thanh
